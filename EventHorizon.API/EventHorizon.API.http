@@ -1,0 +1,6 @@
+@EventHorizon.API_HostAddress = http://localhost:5188
+
+GET {{EventHorizon.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

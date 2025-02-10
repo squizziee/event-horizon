@@ -1,0 +1,25 @@
+services:
+  eventhorizon.api:
+    image: ${DOCKER_REGISTRY-}eventhorizonapi
+    build:
+      context: .
+      dockerfile: EventHorizon.API/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+
+  main_database:
+    image: postgres:latest
+    container_name: pg_main_db
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=admin
+        - POSTGRES_DB=eventhorizon
+    ports:
+        - "5432:5432"
+    restart: always
+    volumes:
+        - eventhorizon_data:/var/lib/postgresql/data/
+
+volumes:
+    eventhorizon_data:
