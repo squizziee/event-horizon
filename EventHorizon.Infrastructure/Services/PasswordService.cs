@@ -11,7 +11,7 @@ namespace EventHorizon.Infrastructure.Services
             return hash;
         }
 
-        public bool VerifyHash(string providedPassword, string validPasswordHash)
+        public bool VerifyPassword(string providedPassword, string validPasswordHash)
         {
             return BCrypt.Net.BCrypt.EnhancedVerify(providedPassword, validPasswordHash);
         }

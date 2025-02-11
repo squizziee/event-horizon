@@ -8,8 +8,10 @@ using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
 using EventHorizon.Infrastructure.Services;
 using EventHorizon.Infrastructure.Services.Interfaces;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,36 @@ builder.Services.AddDbContext<DatabaseContext>(
 		options.UseNpgsql(builder.Configuration.GetValue<string>("NpgsqlConnectionString"));
 	}
 );
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(
+        options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:AccessToken:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:AccessToken:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AccessToken:Key"]!))
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+                    if (!string.IsNullOrEmpty(accessToken))
+                        context.Token = accessToken;
+                    return Task.CompletedTask;
+                }
+            };
+        }
+    );
+
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -40,6 +72,8 @@ builder.Services.AddScoped<IValidator<RegsiterUserRequest>, RegisterRequestValid
 
 
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
 
 var app = builder.Build();
 
@@ -47,11 +81,11 @@ if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
-    using (var scope = app.Services.CreateScope())
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        dbContext.Database.Migrate();
-    }
+	using (var scope = app.Services.CreateScope())
+	{
+		var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+		dbContext.Database.Migrate();
+	}
 }
 
 app.UseHttpsRedirection();

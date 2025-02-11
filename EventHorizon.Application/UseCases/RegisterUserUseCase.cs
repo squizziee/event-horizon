@@ -25,6 +25,8 @@ namespace EventHorizon.Application.UseCases
             _validator = validator;
         }
 
+        // no validation for email existence is done because email PGSQL index was created,
+        // so it will just throw on duplicate email
         public async Task<(string, string)?> ExecuteAsync(RegsiterUserRequest request, CancellationToken cancellationToken)
         {
             var validationResult = _validator.Validate(request);
@@ -53,11 +55,16 @@ namespace EventHorizon.Application.UseCases
                 return null;
             }
 
-            return (
-                _tokenService.GenerateAccessToken(newUser), 
-                _tokenService.GenerateRefreshToken(newUser)
+            var tokens = (
+               _tokenService.GenerateAccessToken(newUser),
+               _tokenService.GenerateRefreshToken(newUser)
             );
-            
+
+            newUser.RefreshToken = tokens.Item2;
+            await _unitOfWork.Users.UpdateAsync(newUser, cancellationToken);
+
+            return tokens;
+
         }
     }
 }

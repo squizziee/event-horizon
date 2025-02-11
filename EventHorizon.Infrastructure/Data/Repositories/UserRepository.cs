@@ -24,6 +24,20 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             return Task.CompletedTask;
         }
 
+        public Task<User?> FindByEmail(string email)
+        {
+            return Task.FromResult(
+                _context.Users.FirstOrDefault(u => u.Email == email)
+            );
+        }
+
+        public Task<User?> FindByRefreshToken(string token)
+        {
+            return Task.FromResult(
+                _context.Users.FirstOrDefault(u => u.RefreshToken == token)
+            );
+        }
+
         public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(

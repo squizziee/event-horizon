@@ -9,6 +9,6 @@ namespace EventHorizon.Application.UseCases.Interfaces
 {
     public interface ILoginUseCase
     {
-        Task<(string, string)> ExecuteAsync(RegsiterUserRequest request);
+        Task<(string, string)?> ExecuteAsync(LoginRequest request, CancellationToken cancellationToken);
     }
 }

@@ -3,6 +3,6 @@
     public interface IPasswordService
     {
         string HashPassword(string password);
-        bool VerifyHash(string providedPassword, string validPasswordHash);
+        bool VerifyPassword(string providedPassword, string validPasswordHash);
     }
 }
