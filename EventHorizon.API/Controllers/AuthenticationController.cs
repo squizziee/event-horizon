@@ -11,16 +11,22 @@ namespace EventHorizon.API.Controllers
         private readonly IRegisterUserUseCase _registerUserUseCase;
         private readonly ILoginUseCase _loginUseCase;
         private readonly IRefreshTokensUseCase _refreshTokensUseCase;
+        private readonly IGetUserDataUseCase _getUserDataUseCase;
+        private readonly IGetAllUsersUseCase _getAllUsersUseCase;
         private readonly CookieOptions _accessTokenCookieOptions;
         private readonly CookieOptions _refreshTokenCookieOptions;
         public AuthenticationController(
             IRegisterUserUseCase registerUserUseCase,
             ILoginUseCase loginUseCase,
             IRefreshTokensUseCase refreshTokensUseCase,
+            IGetUserDataUseCase getUserDataUseCase,
+            IGetAllUsersUseCase getAllUsersUseCase,
             IConfiguration configuration) {
             _registerUserUseCase = registerUserUseCase;
             _loginUseCase = loginUseCase;
             _refreshTokensUseCase = refreshTokensUseCase;
+            _getUserDataUseCase = getUserDataUseCase;
+            _getAllUsersUseCase = getAllUsersUseCase;
 
             _accessTokenCookieOptions = new()
             {
@@ -101,6 +107,25 @@ namespace EventHorizon.API.Controllers
             Response.Cookies.Append("refreshToken", tokens.Value.Item2, _refreshTokenCookieOptions);
 
             return Ok();
+        }
+
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetUserData(
+            [FromRoute] Guid Id,
+            CancellationToken cancellationToken)
+        {
+            var data = await _getUserDataUseCase.ExecuteAsync(Id, cancellationToken);
+
+            return Ok(data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers(
+            CancellationToken cancellationToken)
+        {
+            var users = await _getAllUsersUseCase.ExecuteAsync(cancellationToken);
+
+            return Ok(users);
         }
     }
 }

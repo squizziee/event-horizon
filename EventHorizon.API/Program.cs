@@ -1,3 +1,4 @@
+using EventHorizon.Application.MapperProfiles;
 using EventHorizon.Application.UseCases;
 using EventHorizon.Application.UseCases.Interfaces;
 using EventHorizon.Application.Validation;
@@ -70,10 +71,15 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddScoped<IValidator<RegsiterUserRequest>, RegisterRequestValidator>();
 
+builder.Services.AddAutoMapper(
+    typeof(UserMapperProfile)
+);
 
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
+builder.Services.AddScoped<IGetUserDataUseCase, GetUserDataUseCase>();
+builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
 
 var app = builder.Build();
 

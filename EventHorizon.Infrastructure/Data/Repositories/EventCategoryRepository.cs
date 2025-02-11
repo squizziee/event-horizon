@@ -23,6 +23,13 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             return Task.CompletedTask;
         }
 
+        public Task<IEnumerable<EventCategory>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(
+                _context.EventCategories.AsEnumerable()
+            );
+        }
+
         public Task<EventCategory?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(
