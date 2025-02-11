@@ -1,19 +1,24 @@
-﻿using EventHorizon.Contracts.Requests;
+﻿using EventHorizon.Application.UseCases.Interfaces;
+using EventHorizon.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventHorizon.API.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/user")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        public AuthenticationController() {
-            
+        private readonly IRegisterUserUseCase _registerUserUseCase;
+        public AuthenticationController(IRegisterUserUseCase registerUserUseCase) {
+            _registerUserUseCase = registerUserUseCase;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RegisterUser(RegsiterUserRequest request)
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterUser(
+            [FromForm] RegsiterUserRequest request, 
+            CancellationToken cancellationToken)
         {
+            await _registerUserUseCase.ExecuteAsync(request, cancellationToken);
             return Ok(request);
         }
     }

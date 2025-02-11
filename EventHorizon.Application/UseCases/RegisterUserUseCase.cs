@@ -1,13 +1,63 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces;
+using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests;
+using EventHorizon.Domain.Entities;
+using EventHorizon.Infrastructure.Data;
+using EventHorizon.Infrastructure.Services.Interfaces;
+using FluentValidation;
 
 namespace EventHorizon.Application.UseCases
 {
     public class RegisterUserUseCase : IRegisterUserUseCase
     {
-        public Task<(string, string)> ExecuteAsync(RegsiterUserRequest request)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ITokenService _tokenService;
+        private readonly IPasswordService _passwordService;
+        private readonly IValidator<RegsiterUserRequest> _validator;
+        public RegisterUserUseCase(
+            IUnitOfWork unitOfWork,
+            ITokenService tokenService, 
+            IPasswordService passwordService, 
+            IValidator<RegsiterUserRequest> validator) { 
+            _unitOfWork = unitOfWork;
+            _tokenService = tokenService;
+            _passwordService = passwordService;
+            _validator = validator;
+        }
+
+        public async Task<(string, string)?> ExecuteAsync(RegsiterUserRequest request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var validationResult = _validator.Validate(request);
+
+            if (!validationResult.IsValid)
+            {
+                throw new BadRequestException();
+            }
+
+            var newUser = new User
+            {
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                DateOfBirth = request.DateOfBirth,
+                PasswordHash = _passwordService.HashPassword(request.Password)
+            };
+
+            try
+            {
+                await _unitOfWork.Users.AddAsync(newUser, cancellationToken);
+                _unitOfWork.Save();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            return (
+                _tokenService.GenerateAccessToken(newUser), 
+                _tokenService.GenerateRefreshToken(newUser)
+            );
+            
         }
     }
 }

@@ -41,7 +41,22 @@ namespace EventHorizon.Infrastructure.Services
 
         public string GenerateRefreshToken(User user)
         {
-            throw new NotImplementedException();
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:RefreshToken:Key"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:RefreshToken:Issuer"],
+                audience: _configuration["JWT:RefreshToken:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(double.Parse(_configuration["Jwt:RefreshToken:ExpirationTimeInDays"]!)),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

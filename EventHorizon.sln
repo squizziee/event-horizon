@@ -7,11 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.API", "EventHo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Domain", "EventHorizon.Domain\EventHorizon.Domain.csproj", "{78F9B15D-3E56-4044-BA06-8E8513F71482}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Infrastructure", "EventHorizon.Infrastucture\EventHorizon.Infrastructure.csproj", "{67A7FA46-2112-4A3E-96ED-FE6060A56818}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Infrastructure", "EventHorizon.Infrastructure\EventHorizon.Infrastructure.csproj", "{67A7FA46-2112-4A3E-96ED-FE6060A56818}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Contracts", "EventHorizon.Contracts\EventHorizon.Contracts.csproj", "{4CDE54B2-C1B7-4214-88A9-6EB6566398E2}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{A461D26E-CF57-41E9-A162-B97BBE2598B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Application", "EventHorizon.Application\EventHorizon.Application.csproj", "{FE251808-6214-4C84-A210-6F691A82B16F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{A461D26E-CF57-41E9-A162-B97BBE2598B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A461D26E-CF57-41E9-A162-B97BBE2598B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A461D26E-CF57-41E9-A162-B97BBE2598B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE251808-6214-4C84-A210-6F691A82B16F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE251808-6214-4C84-A210-6F691A82B16F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE251808-6214-4C84-A210-6F691A82B16F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE251808-6214-4C84-A210-6F691A82B16F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

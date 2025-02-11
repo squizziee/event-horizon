@@ -31,6 +31,9 @@ namespace EventHorizon.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new UserConfig());
+            modelBuilder.ApplyConfiguration(new EventConfig());
+            modelBuilder.ApplyConfiguration(new EventEntryConfig());
+            modelBuilder.ApplyConfiguration(new EventCategoryConfig());
         }
     }
 }

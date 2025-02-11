@@ -14,7 +14,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["EventHorizon.API/EventHorizon.API.csproj", "EventHorizon.API/"]
 COPY ["EventHorizon.Contracts/EventHorizon.Contracts.csproj", "EventHorizon.Contracts/"]
-COPY ["EventHorizon.Infrastucture/EventHorizon.Infrastructure.csproj", "EventHorizon.Infrastucture/"]
+COPY ["EventHorizon.Infrastructure/EventHorizon.Infrastructure.csproj", "EventHorizon.Infrastructure/"]
 COPY ["EventHorizon.Domain/EventHorizon.Domain.csproj", "EventHorizon.Domain/"]
 RUN dotnet restore "./EventHorizon.API/EventHorizon.API.csproj"
 COPY . .
@@ -25,6 +25,12 @@ RUN dotnet build "./EventHorizon.API.csproj" -c $BUILD_CONFIGURATION -o /app/bui
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./EventHorizon.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+## Run migrations
+FROM buildbase as migrations
+RUN dotnet tool install --version 6.0.9 --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+ENTRYPOINT dotnet-ef database update --project src/EventHorizon.Infrastructure/ --startup-project src/EventHorizon.API/
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final

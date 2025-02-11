@@ -9,6 +9,9 @@ namespace EventHorizon.Infrastructure.Data.Config
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder
+                .ToTable("Users");
+
+            builder
                 .HasKey(u => u.Id);
 
             builder

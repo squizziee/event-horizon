@@ -7,10 +7,12 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
+    depends_on:
+      - main_database
 
   main_database:
     image: postgres:latest
-    container_name: pg_main_db
+    container_name: main_database
     environment:
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=admin
