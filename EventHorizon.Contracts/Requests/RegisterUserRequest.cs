@@ -1,6 +1,6 @@
 ﻿namespace EventHorizon.Contracts.Requests
 {
-    public record RegsiterUserRequest
+    public record RegisterUserRequest
     {
         public required string Email { get; set; }
         public required string Password { get; set; }

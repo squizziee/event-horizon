@@ -47,6 +47,18 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
             if (_context.Events.Count() % chunkSize == 0) --chunkCount;
 
+            if (!_context.Events.Any())
+            {
+                return Task.FromResult(
+                    new PaginatedEnumerable<Event>
+                    {
+                        ChunkSequenceNumber = 0,
+                        TotalChunkCount = 0,
+                        Items = []
+                    }
+                );
+            }
+
             if (chunkNumber >= chunkCount)
             {
                 throw new ArgumentException($"Can't acquire {chunkNumber + 1}th chunk out of {chunkCount} chunks");
@@ -107,6 +119,18 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
             if (filtered.Count() % chunkSize == 0) --chunkCount;
 
+            if (!filtered.Any())
+            {
+                return Task.FromResult(
+                    new PaginatedEnumerable<Event>
+                    {
+                        ChunkSequenceNumber = 0,
+                        TotalChunkCount = 0,
+                        Items = []
+                    }
+                );
+            }
+
             if (chunkNumber >= chunkCount)
             {
                 throw new ArgumentException($"Can't acquire {chunkNumber + 1}th chunk out of {chunkCount} chunks");
@@ -137,6 +161,7 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             tryFind.CategoryId = entity.CategoryId;
             tryFind.DateTime = entity.DateTime;
             tryFind.MaxParticipantCount = entity.MaxParticipantCount;
+            tryFind.ImageUrls = entity.ImageUrls;
 
             await _context.SaveChangesAsync(cancellationToken);
         }

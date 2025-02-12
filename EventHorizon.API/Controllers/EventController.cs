@@ -20,16 +20,16 @@ namespace EventHorizon.API.Controllers
         public EventController(
             IGetAllEventsUseCase getAllEventsUseCase,
             IGetEventUseCase getEventUseCase,
-            //ISearchEventsUseCase searchEventsUseCase,
-            IAddEventUseCase addEventUseCase//,
-            //IUpdateEventUseCase updateEventUseCase,
-            /*IDeleteEventUseCase deleteEventUseCase*/) { 
+            ISearchEventsUseCase searchEventsUseCase,
+            IAddEventUseCase addEventUseCase,
+            IUpdateEventUseCase updateEventUseCase,
+            IDeleteEventUseCase deleteEventUseCase) { 
             _getAllEventsUseCase = getAllEventsUseCase;
             _getEventUseCase = getEventUseCase;
-            //_searchEventsUseCase = searchEventsUseCase;
+            _searchEventsUseCase = searchEventsUseCase;
             _addEventUseCase = addEventUseCase;
-            //_updateEventUseCase = updateEventUseCase;
-            //_deleteEventUseCase = deleteEventUseCase;
+            _updateEventUseCase = updateEventUseCase;
+            _deleteEventUseCase = deleteEventUseCase;
 
         }
 
@@ -60,7 +60,9 @@ namespace EventHorizon.API.Controllers
             [FromQuery] SearchEventsRequest request,
             CancellationToken cancellationToken)
         {
-            return Ok();
+            var data = await _searchEventsUseCase.ExecuteAsync(request, cancellationToken);
+
+            return Ok(data);
         }
 
         [HttpPost]
@@ -81,6 +83,8 @@ namespace EventHorizon.API.Controllers
             [FromForm] UpdateEventRequest request,
             CancellationToken cancellationToken)
         {
+            await _updateEventUseCase.ExecuteAsync(Id, request, cancellationToken);
+
             return Ok();
         }
 
@@ -90,6 +94,8 @@ namespace EventHorizon.API.Controllers
             [FromRoute] Guid Id,
             CancellationToken cancellationToken)
         {
+            await _deleteEventUseCase.ExecuteAsync(Id, cancellationToken);
+
             return Ok();
         }
     }

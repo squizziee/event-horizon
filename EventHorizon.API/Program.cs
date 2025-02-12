@@ -87,8 +87,11 @@ builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("
 builder.Services.Configure<ImageUploadOptions>(builder.Configuration.GetSection("Infrastructure:ImageUpload"));
 
 
-builder.Services.AddScoped<IValidator<RegsiterUserRequest>, RegisterRequestValidator>();
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterRequestValidator>();
 builder.Services.AddScoped<IValidator<AddEventRequest>, AddEventRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateEventRequest>, UpdateEventRequestValidator>();
+
+
 builder.Services.AddScoped<IValidator<AddCategoryRequest>, AddCategoryRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryRequestValidator>();
 
@@ -96,7 +99,8 @@ builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryRequ
 builder.Services.AddAutoMapper(
 	typeof(UserMapperProfile),
 	typeof(EventMapperProfile),
-	typeof(CategoryMapperProfile)
+	typeof(CategoryMapperProfile),
+	typeof(EventRequestToEntityMapperProfile)
 );
 
 
@@ -108,7 +112,10 @@ builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
 
 builder.Services.AddScoped<IGetAllEventsUseCase, GetAllEventsUseCase>();
 builder.Services.AddScoped<IGetEventUseCase, GetEventUseCase>();
+builder.Services.AddScoped<ISearchEventsUseCase, SearchEventsUseCase>();
 builder.Services.AddScoped<IAddEventUseCase, AddEventUseCase>();
+builder.Services.AddScoped<IUpdateEventUseCase, UpdateEventUseCase>();
+builder.Services.AddScoped<IDeleteEventUseCase, DeleteEventUseCase>();
 
 
 builder.Services.AddScoped<IGetAllCategoriesUseCase, GetAllCategoriesUseCase>();
@@ -123,11 +130,10 @@ if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
-	using (var scope = app.Services.CreateScope())
-	{
-		var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-		dbContext.Database.Migrate();
-	}
+
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+    dbContext.Database.Migrate();
 }
 
 app.UseStaticFiles();

@@ -7,5 +7,6 @@
         public IEnumerable<Guid>? Categories { get; set; }
         public DateOnly? SearchFromDate { get; set; }
         public DateOnly? SearchUntilDate { get; set; }
+        public required int PageNumber { get; set; }
     }
 }

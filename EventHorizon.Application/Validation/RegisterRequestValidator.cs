@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace EventHorizon.Application.Validation
 {
-    public class RegisterRequestValidator : AbstractValidator<RegsiterUserRequest>
+    public class RegisterRequestValidator : AbstractValidator<RegisterUserRequest>
     {
         public RegisterRequestValidator() {
             RuleFor(r => r.Email)

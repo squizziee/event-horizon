@@ -58,19 +58,24 @@ namespace EventHorizon.Infrastructure.Services
         {
             // assuming address format is https://localhost:0000/path/to/folder/image.jpg
             // parts are going to be:
-            //   - "https:"    [0]
-            //   - ""          [1]
-            //   - "path"      [2]
-            //   - "to"        [3]
-            //   - "folder"    [4]
-            //   - "image.jpg" [5]
+            //   - "https:"            [0]
+            //   - ""                  [1]
+            //   - "localhost:0000"    [2]
+            //   - "path"              [3]
+            //   - "to"                [4]
+            //   - "folder"            [5]
+            //   - "image.jpg"         [6],
+            // so skipping 3 means to start with "path"
             var pathParts = accesibleImageUrl.Split("/");
 
-            var relativePath =  string.Join("/", pathParts.Skip(2).ToArray());
+            var actualPath = Path.Combine(
+                _environment.WebRootPath,
+                string.Join(Path.PathSeparator, pathParts.Skip(3).ToArray())
+            );
 
-            if (File.Exists(relativePath))
+            if (File.Exists(actualPath))
             {
-                File.Delete(relativePath);
+                File.Delete(actualPath);
                 return Task.CompletedTask;
             }
 

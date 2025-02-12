@@ -13,12 +13,12 @@ namespace EventHorizon.Application.UseCases
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
-        private readonly IValidator<RegsiterUserRequest> _validator;
+        private readonly IValidator<RegisterUserRequest> _validator;
         public RegisterUserUseCase(
             IUnitOfWork unitOfWork,
             ITokenService tokenService, 
             IPasswordService passwordService, 
-            IValidator<RegsiterUserRequest> validator) { 
+            IValidator<RegisterUserRequest> validator) { 
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
             _passwordService = passwordService;
@@ -27,7 +27,7 @@ namespace EventHorizon.Application.UseCases
 
         // no validation for email existence is done because email PGSQL index was created,
         // so it will just throw on duplicate email
-        public async Task<(string, string)?> ExecuteAsync(RegsiterUserRequest request, CancellationToken cancellationToken)
+        public async Task<(string, string)?> ExecuteAsync(RegisterUserRequest request, CancellationToken cancellationToken)
         {
             var validationResult = _validator.Validate(request);
 

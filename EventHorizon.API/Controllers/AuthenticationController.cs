@@ -51,7 +51,7 @@ namespace EventHorizon.API.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser(
-            [FromForm] RegsiterUserRequest request, 
+            [FromForm] RegisterUserRequest request, 
             CancellationToken cancellationToken)
         {
             var tokens = await _registerUserUseCase.ExecuteAsync(request, cancellationToken);
