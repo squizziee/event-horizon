@@ -39,7 +39,9 @@ namespace EventHorizon.API.Controllers
             [FromQuery] GetAllEventsRequest request,
             CancellationToken cancellationToken)
         {
-            return Ok();
+            var events = await _getAllEventsUseCase.ExecuteAsync(request, cancellationToken);
+
+            return Ok(events);
         }
 
         [HttpGet("{Id}")]
@@ -61,9 +63,11 @@ namespace EventHorizon.API.Controllers
         [HttpPost]
         [Authorize(Policy = "ViewerPolicy")]
         public async Task<IActionResult> AddEvent(
-            [FromQuery] AddEventRequest request,
+            [FromForm] AddEventRequest request,
             CancellationToken cancellationToken)
         {
+            await _addEventUseCase.ExecuteAsync(request, cancellationToken);
+
             return Ok();
         }
 
@@ -71,7 +75,7 @@ namespace EventHorizon.API.Controllers
         [Authorize(Policy = "ViewerPolicy")]
         public async Task<IActionResult> UpdateEvent(
             [FromRoute] Guid Id,
-            [FromQuery] UpdateEventRequest request,
+            [FromForm] UpdateEventRequest request,
             CancellationToken cancellationToken)
         {
             return Ok();

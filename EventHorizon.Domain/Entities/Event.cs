@@ -11,5 +11,6 @@
         public Guid CategoryId { get; set; }
         public EventCategory Category { get; set; }
         public IEnumerable<EventEntry> Entries { get; set; } = [];
+        public IEnumerable<string> ImageUrls { get; set; } = [];
     }
 }

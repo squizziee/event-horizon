@@ -1,9 +1,15 @@
 using EventHorizon.Application.Helpers;
 using EventHorizon.Application.MapperProfiles;
 using EventHorizon.Application.UseCases;
+using EventHorizon.Application.UseCases.EventCategories;
+using EventHorizon.Application.UseCases.Events;
 using EventHorizon.Application.UseCases.Interfaces;
+using EventHorizon.Application.UseCases.Interfaces.EventCategories;
+using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Application.Validation;
 using EventHorizon.Contracts.Requests;
+using EventHorizon.Contracts.Requests.EventCategories;
+using EventHorizon.Contracts.Requests.Events;
 using EventHorizon.Infrastructure.Data;
 using EventHorizon.Infrastructure.Data.Repositories;
 using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
@@ -74,22 +80,41 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+
 
 builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("Application:Pagination"));
 builder.Services.Configure<ImageUploadOptions>(builder.Configuration.GetSection("Infrastructure:ImageUpload"));
 
+
 builder.Services.AddScoped<IValidator<RegsiterUserRequest>, RegisterRequestValidator>();
+builder.Services.AddScoped<IValidator<AddEventRequest>, AddEventRequestValidator>();
+builder.Services.AddScoped<IValidator<AddCategoryRequest>, AddCategoryRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryRequestValidator>();
+
 
 builder.Services.AddAutoMapper(
 	typeof(UserMapperProfile),
-	typeof(EventMapperProfile)
+	typeof(EventMapperProfile),
+	typeof(CategoryMapperProfile)
 );
+
 
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
 builder.Services.AddScoped<IGetUserDataUseCase, GetUserDataUseCase>();
 builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
+
+builder.Services.AddScoped<IGetAllEventsUseCase, GetAllEventsUseCase>();
+builder.Services.AddScoped<IAddEventUseCase, AddEventUseCase>();
+
+
+builder.Services.AddScoped<IGetAllCategoriesUseCase, GetAllCategoriesUseCase>();
+builder.Services.AddScoped<IGetCategoryUseCase, GetCategoryUseCase>();
+builder.Services.AddScoped<IAddCategoryUseCase, AddCategoryUseCase>();
+builder.Services.AddScoped<IUpdateCategoryUseCase, UpdateCategoryUseCase>();
+builder.Services.AddScoped<IDeleteCategoryUseCase, DeleteCategoryUseCase>();
 
 var app = builder.Build();
 

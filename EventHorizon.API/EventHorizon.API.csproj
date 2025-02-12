@@ -27,4 +27,8 @@
     <ProjectReference Include="..\EventHorizon.Infrastructure\EventHorizon.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

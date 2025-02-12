@@ -2,6 +2,6 @@
 {
     public record GetAllEventsRequest
     {
-        public required int PageNumber;
+        public required int PageNumber { get; set; }
     }
 }

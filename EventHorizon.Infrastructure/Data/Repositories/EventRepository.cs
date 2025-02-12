@@ -42,7 +42,14 @@ namespace EventHorizon.Infrastructure.Data.Repositories
                 .Take(chunkSize)
                 .AsEnumerable();
 
-            var chunkCount = _context.Events.Count() / chunkSize;
+            var chunkCount = _context.Events.Count() / chunkSize + 1;
+
+            if (_context.Events.Count() % chunkSize == 0) --chunkCount;
+
+            if (chunkNumber >= chunkCount)
+            {
+                throw new ArgumentException($"Can't acquire {chunkNumber + 1}th chunk out of {chunkCount} chunks");
+            }
 
             return Task.FromResult(
                 new PaginatedEnumerable<Event>
@@ -91,7 +98,14 @@ namespace EventHorizon.Infrastructure.Data.Repositories
                 .Take(chunkSize)
                 .AsEnumerable();
 
-            var chunkCount = filtered.Count() / chunkSize;
+            var chunkCount = filtered.Count() / chunkSize + 1;
+
+            if (filtered.Count() % chunkSize == 0) --chunkCount;
+
+            if (chunkNumber >= chunkCount)
+            {
+                throw new ArgumentException($"Can't acquire {chunkNumber + 1}th chunk out of {chunkCount} chunks");
+            }
 
             return Task.FromResult(
                 new PaginatedEnumerable<Event>
