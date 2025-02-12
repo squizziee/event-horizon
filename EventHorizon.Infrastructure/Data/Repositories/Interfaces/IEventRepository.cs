@@ -2,7 +2,7 @@
 
 namespace EventHorizon.Infrastructure.Data.Repositories.Interfaces
 {
-    public interface IEventRepository : IRepository<Event>
+    public interface IEventRepository : IRepository<Event>, IPaginatableRepository<Event>
     {
     }
 }

@@ -1,6 +1,7 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
+using System.Linq;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {
@@ -24,6 +25,35 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             return Task.CompletedTask;
         }
 
+        public Task<PaginatedEnumerable<Event>> GetAllAsync(int chunkNumber, int chunkSize, CancellationToken cancellationToken)
+        {
+            if (chunkNumber < 0)
+            {
+                throw new ArgumentException($"Chunk number {chunkNumber} is unacceptable for pagination");
+            }
+
+            if (chunkSize <= 0)
+            {
+                throw new ArgumentException($"Chunk size {chunkSize} is unacceptable for pagination");
+            }
+
+            var result = _context.Events
+                .Skip(chunkNumber * chunkSize)
+                .Take(chunkSize)
+                .AsEnumerable();
+
+            var chunkCount = _context.Events.Count() / chunkSize;
+
+            return Task.FromResult(
+                new PaginatedEnumerable<Event>
+                {
+                    ChunkSequenceNumber = chunkNumber,
+                    TotalChunkCount = chunkCount,
+                    Items = result
+                }
+            );
+        }
+
         public Task<IEnumerable<Event>> GetAllAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(
@@ -35,6 +65,41 @@ namespace EventHorizon.Infrastructure.Data.Repositories
         {
             return Task.FromResult(
                 _context.Events.FirstOrDefault(u => u.Id == id)
+            );
+        }
+
+        public Task<PaginatedEnumerable<Event>> GetFilteredAsync(
+            Func<Event, bool> predicate, 
+            int chunkNumber, 
+            int chunkSize, 
+            CancellationToken cancellationToken)
+        {
+            if (chunkNumber < 0)
+            {
+                throw new ArgumentException($"Chunk number {chunkNumber} is unacceptable for pagination");
+            }
+
+            if (chunkSize <= 0)
+            {
+                throw new ArgumentException($"Chunk size {chunkSize} is unacceptable for pagination");
+            }
+
+            var filtered = _context.Events.Where(predicate);
+
+            var result = filtered
+                .Skip(chunkNumber * chunkSize)
+                .Take(chunkSize)
+                .AsEnumerable();
+
+            var chunkCount = filtered.Count() / chunkSize;
+
+            return Task.FromResult(
+                new PaginatedEnumerable<Event>
+                {
+                    ChunkSequenceNumber = chunkNumber,
+                    TotalChunkCount = chunkCount,
+                    Items = result
+                }
             );
         }
 
