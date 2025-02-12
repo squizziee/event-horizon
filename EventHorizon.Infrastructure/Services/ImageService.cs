@@ -47,8 +47,8 @@ namespace EventHorizon.Infrastructure.Services
             await image.CopyToAsync(file);
 
             var accessiblePath =
-                _imageUploadOptions.AccessibleUrl +
-                _imageUploadOptions.Url.Replace("\\", "/") + "/" +
+                _imageUploadOptions.AccessibleUrl + "/" +
+                _imageUploadOptions.Url + "/" +
                 uploadFileName + $".{extension}";
 
             return accessiblePath;

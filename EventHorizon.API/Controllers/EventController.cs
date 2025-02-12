@@ -1,7 +1,6 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Contracts.Requests.Events;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventHorizon.API.Controllers
@@ -21,16 +20,16 @@ namespace EventHorizon.API.Controllers
         public EventController(
             IGetAllEventsUseCase getAllEventsUseCase,
             IGetEventUseCase getEventUseCase,
-            ISearchEventsUseCase searchEventsUseCase,
-            IAddEventUseCase addEventUseCase,
-            IUpdateEventUseCase updateEventUseCase,
-            IDeleteEventUseCase deleteEventUseCase) { 
+            //ISearchEventsUseCase searchEventsUseCase,
+            IAddEventUseCase addEventUseCase//,
+            //IUpdateEventUseCase updateEventUseCase,
+            /*IDeleteEventUseCase deleteEventUseCase*/) { 
             _getAllEventsUseCase = getAllEventsUseCase;
             _getEventUseCase = getEventUseCase;
-            _searchEventsUseCase = searchEventsUseCase;
+            //_searchEventsUseCase = searchEventsUseCase;
             _addEventUseCase = addEventUseCase;
-            _updateEventUseCase = updateEventUseCase;
-            _deleteEventUseCase = deleteEventUseCase;
+            //_updateEventUseCase = updateEventUseCase;
+            //_deleteEventUseCase = deleteEventUseCase;
 
         }
 
@@ -41,15 +40,19 @@ namespace EventHorizon.API.Controllers
         {
             var events = await _getAllEventsUseCase.ExecuteAsync(request, cancellationToken);
 
+            var list = events.Events.ToList();
+
             return Ok(events);
         }
 
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetEvent(
-            [FromQuery] Guid Id,
+            [FromRoute] Guid Id,
             CancellationToken cancellationToken)
         {
-            return Ok();
+            var data = await _getEventUseCase.ExecuteAsync(Id, cancellationToken);
+
+            return Ok(data);
         }
 
         [HttpGet("search")]

@@ -1,7 +1,7 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {
@@ -38,6 +38,7 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             }
 
             var result = _context.Events
+                .Include(e => e.Category)
                 .Skip(chunkNumber * chunkSize)
                 .Take(chunkSize)
                 .AsEnumerable();
@@ -71,7 +72,9 @@ namespace EventHorizon.Infrastructure.Data.Repositories
         public Task<Event?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(
-                _context.Events.FirstOrDefault(u => u.Id == id)
+                _context.Events
+                    .Include(e => e.Category)
+                    .FirstOrDefault(u => u.Id == id)
             );
         }
 
@@ -91,7 +94,9 @@ namespace EventHorizon.Infrastructure.Data.Repositories
                 throw new ArgumentException($"Chunk size {chunkSize} is unacceptable for pagination");
             }
 
-            var filtered = _context.Events.Where(predicate);
+            var filtered = _context.Events
+                .Include(e => e.Category)
+                .Where(predicate);
 
             var result = filtered
                 .Skip(chunkNumber * chunkSize)

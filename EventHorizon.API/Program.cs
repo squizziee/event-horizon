@@ -107,6 +107,7 @@ builder.Services.AddScoped<IGetUserDataUseCase, GetUserDataUseCase>();
 builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
 
 builder.Services.AddScoped<IGetAllEventsUseCase, GetAllEventsUseCase>();
+builder.Services.AddScoped<IGetEventUseCase, GetEventUseCase>();
 builder.Services.AddScoped<IAddEventUseCase, AddEventUseCase>();
 
 
@@ -128,6 +129,8 @@ if (app.Environment.IsDevelopment())
 		dbContext.Database.Migrate();
 	}
 }
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 

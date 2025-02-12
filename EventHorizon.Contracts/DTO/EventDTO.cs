@@ -9,6 +9,7 @@
         public required DateTime DateTime { get; set; }
         public required int CurrentParticipantCount { get; set; }
         public required int MaxParticipantCount { get; set; }
+        public required IList<string> ImageUrls { get; set; }
         public required EventCategoryDTO Category { get; set; }
     }
 }
