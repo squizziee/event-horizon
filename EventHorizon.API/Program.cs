@@ -1,3 +1,4 @@
+using EventHorizon.Application.Helpers;
 using EventHorizon.Application.MapperProfiles;
 using EventHorizon.Application.UseCases;
 using EventHorizon.Application.UseCases.Interfaces;
@@ -6,6 +7,7 @@ using EventHorizon.Contracts.Requests;
 using EventHorizon.Infrastructure.Data;
 using EventHorizon.Infrastructure.Data.Repositories;
 using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
+using EventHorizon.Infrastructure.Helpers;
 using EventHorizon.Infrastructure.Services;
 using EventHorizon.Infrastructure.Services.Interfaces;
 using FluentValidation;
@@ -28,34 +30,38 @@ builder.Services.AddDbContext<DatabaseContext>(
 );
 
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(
-        options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:AccessToken:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:AccessToken:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AccessToken:Key"]!))
-            };
+	.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(
+		options =>
+		{
+			options.TokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = builder.Configuration["Jwt:AccessToken:Issuer"],
+				ValidAudience = builder.Configuration["Jwt:AccessToken:Audience"],
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AccessToken:Key"]!))
+			};
 
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
-                    if (!string.IsNullOrEmpty(accessToken))
-                        context.Token = accessToken;
-                    return Task.CompletedTask;
-                }
-            };
-        }
-    );
+			options.Events = new JwtBearerEvents
+			{
+				OnMessageReceived = context =>
+				{
+					context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+					if (!string.IsNullOrEmpty(accessToken))
+						context.Token = accessToken;
+					return Task.CompletedTask;
+				}
+			};
+		}
+	);
 
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
+    .AddPolicy("ViewerPolicy", policy => policy.RequireRole("Viewer"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -69,10 +75,14 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
+builder.Services.Configure<PaginationOptions>(builder.Configuration.GetSection("Application:Pagination"));
+builder.Services.Configure<ImageUploadOptions>(builder.Configuration.GetSection("Infrastructure:ImageUpload"));
+
 builder.Services.AddScoped<IValidator<RegsiterUserRequest>, RegisterRequestValidator>();
 
 builder.Services.AddAutoMapper(
-    typeof(UserMapperProfile)
+	typeof(UserMapperProfile),
+	typeof(EventMapperProfile)
 );
 
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
@@ -93,6 +103,8 @@ if (app.Environment.IsDevelopment())
 		dbContext.Database.Migrate();
 	}
 }
+
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 
