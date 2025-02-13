@@ -1,13 +1,10 @@
 using AutoMapper;
 using EventHorizon.Application.Helpers;
 using EventHorizon.Application.MapperProfiles;
-using EventHorizon.Application.UseCases.EventCategories;
 using EventHorizon.Application.UseCases.Events;
-using EventHorizon.Application.UseCases.Interfaces.EventCategories;
 using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Application.Validation;
 using EventHorizon.Contracts.Exceptions;
-using EventHorizon.Contracts.Requests.EventCategories;
 using EventHorizon.Contracts.Requests.Events;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data;
@@ -25,10 +22,7 @@ namespace EventHorizon.Tests
     public class TestEventUseCases
 	{
 		private DatabaseContext _context;
-		private IUnitOfWork _unitOfWork;
-
-        private IAddCategoryUseCase _addCategoryUseCase;
-        private IGetAllCategoriesUseCase _getCategoriesUseCase;
+        private IUnitOfWork _unitOfWork;
 
         private IGetAllEventsUseCase _getAllEventsUseCase;
         private IGetEventUseCase _getEventUseCase;
@@ -39,7 +33,6 @@ namespace EventHorizon.Tests
         private IMapper _mapper;
 
         private AddEventRequestValidator _addEventRequestValidator = new();
-        private AddCategoryRequestValidator _addCategoryRequestValidator = new();
         private UpdateEventRequestValidator _updateEventRequestValidator = new();
 
         private Mock<IWebHostEnvironment> _environment;
@@ -98,9 +91,6 @@ namespace EventHorizon.Tests
             var imageService = new ImageService(imageOptions, _environment.Object);
 
             // here we go baby
-            _addCategoryUseCase = new AddCategoryUseCase(_unitOfWork, _addCategoryRequestValidator);
-            _getCategoriesUseCase = new GetAllCategoriesUseCase(_unitOfWork, paginationOptions, _mapper);
-
             _getAllEventsUseCase = new GetAllEventsUseCase(_unitOfWork, _mapper, paginationOptions);
             _getEventUseCase = new GetEventUseCase(_unitOfWork, _mapper);
             _searchEventsUseCase = new SearchEventsUseCase(_unitOfWork, _mapper, paginationOptions);
@@ -756,6 +746,40 @@ namespace EventHorizon.Tests
             Assert.True(supposedToChange.Address != "update");
             Assert.True(supposedToChange.DateTime != time);
             Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task DeleteEvent_ShouldSucceed()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            Assert.True(_context.Events.Count() == 11);
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _deleteEventUseCase.ExecuteAsync(eventId, CancellationToken.None)
+            );
+
+            Assert.Null(exception);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task DeleteEvent_NonExistentId_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            Assert.True(_context.Events.Count() == 11);
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _deleteEventUseCase.ExecuteAsync(Guid.NewGuid(), CancellationToken.None)
+            );
+
+            Assert.True(exception is ResourceNotFoundException);
+            Assert.True(_context.Events.Count() == 11);
         }
 
     }
