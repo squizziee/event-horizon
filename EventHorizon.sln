@@ -15,6 +15,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Application", "EventHorizon.Application\EventHorizon.Application.csproj", "{FE251808-6214-4C84-A210-6F691A82B16F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventHorizon.Tests", "EventHorizon.Tests\EventHorizon.Tests.csproj", "{E25B52EE-2246-46BC-8734-03CAFE4BF8CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{FE251808-6214-4C84-A210-6F691A82B16F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE251808-6214-4C84-A210-6F691A82B16F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE251808-6214-4C84-A210-6F691A82B16F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E25B52EE-2246-46BC-8734-03CAFE4BF8CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E25B52EE-2246-46BC-8734-03CAFE4BF8CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E25B52EE-2246-46BC-8734-03CAFE4BF8CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E25B52EE-2246-46BC-8734-03CAFE4BF8CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

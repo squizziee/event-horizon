@@ -12,13 +12,10 @@ namespace EventHorizon.Infrastructure.Data
         public DbSet<EventEntry> EventEntries { get; set; }
         public DbSet<Event> Events { get; set; }
 
-        private IConfiguration _configuration;
 
-
-        public DatabaseContext(DbContextOptions<DatabaseContext> options, IConfiguration configuration)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
-            _configuration = configuration;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
