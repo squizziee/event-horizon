@@ -1,3 +1,4 @@
+using EventHorizon.API.Extensions;
 using EventHorizon.Application.Helpers;
 using EventHorizon.Application.MapperProfiles;
 using EventHorizon.Application.UseCases;
@@ -70,6 +71,9 @@ builder.Services
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
     .AddPolicy("ViewerPolicy", policy => policy.RequireRole("Viewer", "Admin"));
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -145,6 +149,8 @@ if (app.Environment.IsDevelopment())
     var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
     dbContext.Database.Migrate();
 }
+
+app.UseExceptionHandler();
 
 app.UseStaticFiles();
 
