@@ -2,9 +2,11 @@ using EventHorizon.Application.Helpers;
 using EventHorizon.Application.MapperProfiles;
 using EventHorizon.Application.UseCases;
 using EventHorizon.Application.UseCases.EventCategories;
+using EventHorizon.Application.UseCases.EventEntries;
 using EventHorizon.Application.UseCases.Events;
 using EventHorizon.Application.UseCases.Interfaces;
 using EventHorizon.Application.UseCases.Interfaces.EventCategories;
+using EventHorizon.Application.UseCases.Interfaces.EventEntries;
 using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Application.Validation;
 using EventHorizon.Contracts.Requests;
@@ -67,7 +69,7 @@ builder.Services
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"))
-    .AddPolicy("ViewerPolicy", policy => policy.RequireRole("Viewer"));
+    .AddPolicy("ViewerPolicy", policy => policy.RequireRole("Viewer", "Admin"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -100,7 +102,8 @@ builder.Services.AddAutoMapper(
 	typeof(UserMapperProfile),
 	typeof(EventMapperProfile),
 	typeof(CategoryMapperProfile),
-	typeof(EventRequestToEntityMapperProfile)
+	typeof(EventRequestToEntityMapperProfile),
+	typeof(EventEntryMapperProfile)
 );
 
 
@@ -109,6 +112,7 @@ builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
 builder.Services.AddScoped<IGetUserDataUseCase, GetUserDataUseCase>();
 builder.Services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
+
 
 builder.Services.AddScoped<IGetAllEventsUseCase, GetAllEventsUseCase>();
 builder.Services.AddScoped<IGetEventUseCase, GetEventUseCase>();
@@ -123,6 +127,12 @@ builder.Services.AddScoped<IGetCategoryUseCase, GetCategoryUseCase>();
 builder.Services.AddScoped<IAddCategoryUseCase, AddCategoryUseCase>();
 builder.Services.AddScoped<IUpdateCategoryUseCase, UpdateCategoryUseCase>();
 builder.Services.AddScoped<IDeleteCategoryUseCase, DeleteCategoryUseCase>();
+
+
+builder.Services.AddScoped<IGetEventEntryUseCase, GetEventEntryUseCase>();
+builder.Services.AddScoped<IGetEventEntriesUseCase, GetEventEntriesUseCase>();
+builder.Services.AddScoped<IAddEventEntryUseCase, AddEventEntryUseCase>();
+builder.Services.AddScoped<IDeleteEventEntryUseCase, DeleteEventEntryUseCase>();
 
 var app = builder.Build();
 

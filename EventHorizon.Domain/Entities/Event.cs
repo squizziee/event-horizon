@@ -10,7 +10,7 @@
         public int MaxParticipantCount { get; set; }
         public Guid CategoryId { get; set; }
         public EventCategory Category { get; set; }
-        public IEnumerable<EventEntry> Entries { get; set; } = [];
+        public IList<EventEntry> Entries { get; set; } = [];
         public IList<string> ImageUrls { get; set; } = [];
     }
 }

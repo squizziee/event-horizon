@@ -39,6 +39,7 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
             var result = _context.Events
                 .Include(e => e.Category)
+                .Include(e => e.Entries)
                 .Skip(chunkNumber * chunkSize)
                 .Take(chunkSize)
                 .AsEnumerable();
@@ -86,6 +87,7 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             return Task.FromResult(
                 _context.Events
                     .Include(e => e.Category)
+                    .Include(e => e.Entries)
                     .FirstOrDefault(u => u.Id == id)
             );
         }
@@ -108,6 +110,7 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
             var filtered = _context.Events
                 .Include(e => e.Category)
+                .Include(e => e.Entries)
                 .Where(predicate);
 
             var result = filtered

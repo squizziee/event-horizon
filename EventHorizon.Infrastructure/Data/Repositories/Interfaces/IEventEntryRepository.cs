@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EventHorizon.Infrastructure.Data.Repositories.Interfaces
 {
-    public interface IEventEntryRepository : IRepository<EventEntry>
+    public interface IEventEntryRepository : IRepository<EventEntry>, IPaginatableRepository<EventEntry>
     {
     }
 }

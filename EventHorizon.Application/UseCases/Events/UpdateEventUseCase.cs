@@ -44,6 +44,11 @@ namespace EventHorizon.Application.UseCases.Events
                 throw new ResourceNotFoundException($"No event with id {id} was found");
             }
 
+            if (tryFind.Entries.Count() > request.MaxParticipantCount)
+            {
+                throw new BadRequestException("Can't decrease maximum participant count below actual entry count");
+            }
+
             foreach (var url in tryFind.ImageUrls)
             {
                 try

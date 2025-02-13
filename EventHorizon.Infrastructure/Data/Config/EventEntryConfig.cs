@@ -12,6 +12,10 @@ namespace EventHorizon.Infrastructure.Data.Config
                .HasKey(e => e.Id);
 
             builder
+                .HasIndex(ee => new { ee.EventId, ee.UserId })
+                .IsUnique();
+
+            builder
                  .HasOne(ee => ee.Event)
                  .WithMany(e => e.Entries)
                  .HasForeignKey(ee => ee.EventId);
