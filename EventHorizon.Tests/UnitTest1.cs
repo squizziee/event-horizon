@@ -6,8 +6,10 @@ using EventHorizon.Application.UseCases.Events;
 using EventHorizon.Application.UseCases.Interfaces.EventCategories;
 using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Application.Validation;
+using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests.EventCategories;
 using EventHorizon.Contracts.Requests.Events;
+using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data;
 using EventHorizon.Infrastructure.Data.Repositories;
 using EventHorizon.Infrastructure.Helpers;
@@ -103,6 +105,8 @@ namespace EventHorizon.Tests
             _getEventUseCase = new GetEventUseCase(_unitOfWork, _mapper);
             _searchEventsUseCase = new SearchEventsUseCase(_unitOfWork, _mapper, paginationOptions);
             _addEventUseCase = new AddEventUseCase(_unitOfWork, imageService, _addEventRequestValidator, _mapper);
+            _updateEventUseCase = new UpdateEventUseCase(_unitOfWork, imageService, _updateEventRequestValidator, _mapper);
+            _deleteEventUseCase = new DeleteEventUseCase(_unitOfWork, imageService);
         }
 
         public TestEventUseCases ()
@@ -119,26 +123,11 @@ namespace EventHorizon.Tests
 		{
             Init();
 
-            var addCategoryRequest = new AddCategoryRequest
-            {
-                Name = "test_category",
-                Description = "test_category_description",
-            };
-
-
-            await _addCategoryUseCase.ExecuteAsync(addCategoryRequest, CancellationToken.None);
-
-            var getCategoriesRequest = new GetAllCategoriesRequest { 
-                PageNumber = 0 
-            };
-
-            var categories = await _getCategoriesUseCase.ExecuteAsync(getCategoriesRequest, CancellationToken.None);
-
-            var categoryId = categories.Categories.First().Id;
+            var categoryId = await AddCategory();
 
             for (int i = 0; i < eventCount; i++)
             {
-                var addEventRequest = new AddEventRequest
+                var event_ = new Event
                 {
                     Name = $"test_event_{i}",
                     Description = $"test_event_desc_{i}",
@@ -148,10 +137,41 @@ namespace EventHorizon.Tests
                     CategoryId = categoryId,
                 };
 
-                await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None);
+                _context.Add(event_);
             }
+            _context.SaveChanges();
 
             return categoryId;
+        }
+
+        private async Task<Guid> AddCategory()
+        {
+            var id = Guid.NewGuid();
+            _context.EventCategories.Add(new EventCategory
+            {
+                Id = id,
+                Name = "test_category",
+                Description = "test_category_description",
+            });
+            _context.SaveChanges();
+            return id;
+        }
+
+        private async Task<Guid> AddEvent(int i, Guid categoryId)
+        {
+            var id = Guid.NewGuid();
+            _context.Events.Add(new Event
+            {
+                Id = id,
+                Name = $"test_event_{i}",
+                Description = $"test_event_desc_{i}",
+                Address = $"test_event_addr_{i}",
+                DateTime = DateTime.Now.AddDays(i),
+                MaxParticipantCount = 1000 + i,
+                CategoryId = categoryId,
+            });
+            _context.SaveChanges();
+            return id;
         }
 
 		[Fact]
@@ -329,5 +349,414 @@ namespace EventHorizon.Tests
             Assert.True(events.PageNumber == 0);
             Assert.True(events.Events.Count() == 3);
         }
+
+        [Fact]
+        public async Task GetEvent_ShouldReturnDTO()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(23, categoryId);
+
+            var eventResponse = await _getEventUseCase.ExecuteAsync(eventId, CancellationToken.None);
+
+            Assert.True(eventResponse.Event.Id == eventId);
+            Assert.True(eventResponse.Event.MaxParticipantCount == 1000 + 23);
+        }
+
+        [Fact]
+        public async Task GetEvent_NonExistentId_ShouldThrow()
+        {
+            await FlushAndPopulateEvents(10);
+
+            await Assert.ThrowsAsync<ResourceNotFoundException>(
+                async () => await _getEventUseCase.ExecuteAsync(Guid.NewGuid(), CancellationToken.None)
+            );
+        }
+
+        [Fact]
+        public async Task AddEvent_ShouldSucceed()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "test_event_desc",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.Null(exception);
+            Assert.True(_context.Events.Count() == 11);
+        }
+
+        [Fact]
+        public async Task AddEvent_InvalidName_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "",
+                Description = "test_event_desc",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is BadRequestException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task AddEvent_InvalidDescription_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is BadRequestException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task AddEvent_InvalidAddress_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "test_event_desc",
+                Address = "",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is BadRequestException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task AddEvent_InvalidDate_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "test_event_desc",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now,
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is BadRequestException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task AddEvent_InvalidMaxParticipantCount_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "test_event_desc",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 0,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is BadRequestException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task AddEvent_NonExistentCategoryId_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var addEventRequest = new AddEventRequest
+            {
+                Name = "test_event",
+                Description = "test_event_desc",
+                Address = "test_event_addr",
+                DateTime = DateTime.Now.AddDays(77),
+                MaxParticipantCount = 1000 + 77,
+                CategoryId = Guid.NewGuid(),
+            };
+
+            var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
+
+            Assert.True(exception is ResourceNotFoundException);
+            Assert.True(_context.Events.Count() == 10);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_ShouldSucceed()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(99);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "update",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 23,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.Null(exception);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name == "update");
+            Assert.True(supposedToChange.Description == "update");
+            Assert.True(supposedToChange.Address == "update");
+            Assert.True(supposedToChange.DateTime == time);
+            Assert.True(supposedToChange.MaxParticipantCount == 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_InvalidName_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(99);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "",
+                Description = "update",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 23,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_InvalidDescription_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(99);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 23,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_InvalidAddress_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(99);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "update",
+                Address = "",
+                DateTime = time,
+                MaxParticipantCount = 23,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_InvalidDate_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now;
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "update",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 23,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_InvalidMaxParticipantCount_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(77);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "update",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 0,
+                CategoryId = categoryId,
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_NonExistentCategoryId_ShouldThrow()
+        {
+            var categoryId = await FlushAndPopulateEvents(10);
+
+            var eventId = await AddEvent(997, categoryId);
+
+            var time = DateTime.Now.AddDays(77);
+
+            var updateEventRequest = new UpdateEventRequest
+            {
+                Name = "update",
+                Description = "update",
+                Address = "update",
+                DateTime = time,
+                MaxParticipantCount = 0,
+                CategoryId = Guid.NewGuid(),
+            };
+
+            var exception = await Record.ExceptionAsync(
+                async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
+            );
+
+            Assert.True(exception is BadRequestException);
+
+            var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
+
+            Assert.True(supposedToChange.Name != "update");
+            Assert.True(supposedToChange.Description != "update");
+            Assert.True(supposedToChange.Address != "update");
+            Assert.True(supposedToChange.DateTime != time);
+            Assert.True(supposedToChange.MaxParticipantCount != 23);
+        }
+
     }
 }

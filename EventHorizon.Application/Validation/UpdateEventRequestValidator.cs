@@ -1,10 +1,5 @@
 ﻿using EventHorizon.Contracts.Requests.Events;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EventHorizon.Application.Validation
 {
@@ -19,10 +14,13 @@ namespace EventHorizon.Application.Validation
                 .Length(1, 150);
 
             RuleFor(r => r.Description)
-                .Length(0, 1000);
+                .Length(1, 1000);
 
             RuleFor(r => r.MaxParticipantCount)
                 .GreaterThan(0);
+
+            RuleFor(r => r.DateTime)
+                .Must(dt => dt.CompareTo(DateTime.Now) > 0);
         }
     }
 }

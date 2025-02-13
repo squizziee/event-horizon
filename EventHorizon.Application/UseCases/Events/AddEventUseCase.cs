@@ -37,6 +37,13 @@ namespace EventHorizon.Application.UseCases.Events
 				throw new BadRequestException();
 			}
 
+			var tryFindCategory = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId, cancellationToken);
+
+			if (tryFindCategory == null)
+			{
+				throw new ResourceNotFoundException($"No category with id {request.CategoryId} was found");
+			}
+
 			var imageUrls = new List<string>();
 
 			if (request.AttachedImages != null) {
