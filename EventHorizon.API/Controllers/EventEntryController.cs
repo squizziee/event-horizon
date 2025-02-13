@@ -13,16 +13,19 @@ namespace EventHorizon.API.Controllers
     {
         private readonly IGetEventEntryUseCase _getEventEntryUseCase;
         private readonly IGetEventEntriesUseCase _getEventEntriesUseCase;
+        private readonly IGetUserEntriesUseCase _getUserEntriesUseCase;
         private readonly IAddEventEntryUseCase _addEventEntryUseCase;
         private readonly IDeleteEventEntryUseCase _deleteEventEntryUseCase;
 
         public EventEntryController(
             IGetEventEntryUseCase getEventEntryUseCase,
             IGetEventEntriesUseCase getEventEntriesUseCase,
+            IGetUserEntriesUseCase getUserEntriesUseCase,
             IAddEventEntryUseCase addEventEntryUseCase,
             IDeleteEventEntryUseCase deleteEventEntryUseCase) {
             _getEventEntryUseCase = getEventEntryUseCase;
             _getEventEntriesUseCase = getEventEntriesUseCase;
+            _getUserEntriesUseCase = getUserEntriesUseCase;
             _addEventEntryUseCase = addEventEntryUseCase;
             _deleteEventEntryUseCase = deleteEventEntryUseCase;
         }
@@ -44,6 +47,23 @@ namespace EventHorizon.API.Controllers
             CancellationToken cancellationToken)
         {
             var entries = await _getEventEntriesUseCase.ExecuteAsync(EventId, request, cancellationToken);
+
+            return Ok(entries);
+        }
+
+        [HttpGet("event/user")]
+        [Authorize(Policy = "ViewerPolicy")]
+        public async Task<IActionResult> GetUserEventEntries(
+            CancellationToken cancellationToken)
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.Name);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var entries = await _getUserEntriesUseCase.ExecuteAsync(Guid.Parse(userId.Value), cancellationToken);
 
             return Ok(entries);
         }

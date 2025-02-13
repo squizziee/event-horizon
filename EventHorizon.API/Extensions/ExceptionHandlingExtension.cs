@@ -5,11 +5,22 @@ using Npgsql;
 
 namespace EventHorizon.API.Extensions
 {
+    public static class ExceptionHandlingExtension
+    {
+        public static IServiceCollection AddGlobalExceptionHandling(this IServiceCollection services)
+        {
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+
+            return services;
+        }
+    }
+
     public class GlobalExceptionHandler : IExceptionHandler
     {
         public async ValueTask<bool> TryHandleAsync(
-            HttpContext httpContext, 
-            Exception exception, 
+            HttpContext httpContext,
+            Exception exception,
             CancellationToken cancellationToken)
         {
             var status = StatusCodes.Status418ImATeapot;
@@ -58,4 +69,5 @@ namespace EventHorizon.API.Extensions
 
         }
     }
+
 }

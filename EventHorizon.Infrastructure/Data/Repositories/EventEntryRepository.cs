@@ -87,7 +87,9 @@ namespace EventHorizon.Infrastructure.Data.Repositories
         public Task<EventEntry?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(
-                _context.EventEntries.FirstOrDefault(u => u.Id == id)
+                _context.EventEntries
+                    .Include(e => e.User)
+                    .FirstOrDefault(u => u.Id == id)
             );
         }
 
@@ -146,6 +148,16 @@ namespace EventHorizon.Infrastructure.Data.Repositories
         public Task UpdateAsync(EventEntry entity, CancellationToken cancellationToken)
         {
             throw new ImmutableResourceException("There is no merit in editing entries");
+        }
+
+        public Task<IEnumerable<EventEntry>> GetByUserIdWithEventAsync(Guid userId, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(
+               _context.EventEntries
+                   .Include(ee => ee.Event)
+                   .Where(u => u.UserId == userId)
+                   .AsEnumerable()
+           );
         }
     }
 }
