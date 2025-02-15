@@ -11,6 +11,7 @@ import Navbar from './components/Navbar';
 import AuthPage from './pages/AuthPage';
 import axiosClient from './tools/axiosConfig';
 import ProfilePage from './pages/ProfilePage';
+import EventPage from './pages/EventPage';
 
 
 export const UserContext = React.createContext(null);
@@ -56,6 +57,7 @@ function App() {
             <Route path='catalog' element={<EventCatalogPage />} />
             <Route path='auth' element={<AuthPage />} />
             <Route path='profile' element={<ProfilePage />} />
+            <Route path='event/:id' element={<EventPage />} />
           </Route>
         </Routes>
       </UserContext.Provider>

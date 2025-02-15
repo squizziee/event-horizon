@@ -61,7 +61,7 @@ function EntryCard({ entry, handleUnbookEntry }) {
         "error" : "primary";
 
     return (
-        <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)", p: 2 }}>
+        <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)", p: 2, mb: 2 }}>
             <Typography variant="caption">Applied on {formatTimestamp(entry.submissionDate)}</Typography>
             <Stack direction="column" spacing={0.5} useFlexGap>
                 <Stack direction="row" spacing={2} useFlexGap alignItems='center'>
@@ -80,7 +80,7 @@ function EntryCard({ entry, handleUnbookEntry }) {
                     </Grid2>
                     <Grid2 item>
                         <Button color="error" sx={{ mr: 1 }} onClick={() => handleUnbookEntry(entry.id)}>Unbook entry</Button>
-                        <Button variant="contained" disableElevation>Overview</Button>
+                        <Button variant="contained" disableElevation onClick={() => window.location.href = `event/${entry.event.id}`}>Overview</Button>
                     </Grid2>
                 </Grid2>
             </Stack>

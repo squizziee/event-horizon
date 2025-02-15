@@ -130,7 +130,7 @@ function EventComponent({ event }) {
                         />
                     </Grid2>
                     <Grid2 item>
-                        <Button>Overview</Button>
+                        <Button onClick={() => window.location.href = `/event/${event.id}`}>Overview</Button>
                     </Grid2>
                 </Grid2>
             </Stack>
