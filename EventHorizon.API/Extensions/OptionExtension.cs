@@ -9,6 +9,7 @@ namespace EventHorizon.API.Extensions
         {
             services.Configure<PaginationOptions>(configuration.GetSection("Application:Pagination"));
             services.Configure<ImageUploadOptions>(configuration.GetSection("Infrastructure:ImageUpload"));
+            services.Configure<AdminCredentials>(configuration.GetSection("Application:AdminCredentials"));
 
             return services;
         }

@@ -3,5 +3,6 @@
     public record GetAllCategoriesRequest
     {
         public required int PageNumber { get; set; }
-    }
+        public required bool DoNotPaginate { get; set; } = false;
+}
 }

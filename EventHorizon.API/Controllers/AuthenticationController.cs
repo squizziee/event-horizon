@@ -1,6 +1,7 @@
-﻿using EventHorizon.Application.UseCases.Interfaces;
+﻿using EventHorizon.Application.UseCases.Interfaces.Users;
 using EventHorizon.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EventHorizon.API.Controllers
 {
@@ -85,6 +86,15 @@ namespace EventHorizon.API.Controllers
             return Ok();
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            Response.Cookies.Append("accessToken", "");
+            Response.Cookies.Append("refreshToken", "");
+
+            return Ok();
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshTokens(
             CancellationToken cancellationToken)
@@ -115,6 +125,22 @@ namespace EventHorizon.API.Controllers
             CancellationToken cancellationToken)
         {
             var data = await _getUserDataUseCase.ExecuteAsync(Id, cancellationToken);
+
+            return Ok(data);
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe(
+            CancellationToken cancellationToken)
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.Name);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var data = await _getUserDataUseCase.ExecuteAsync(Guid.Parse(userId.Value), cancellationToken);
 
             return Ok(data);
         }

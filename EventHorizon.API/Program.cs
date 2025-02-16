@@ -8,6 +8,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AllowClientOrigin",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:3000")
+                .AllowCredentials()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
 
 builder.Services.AddDatabaseContext(builder.Configuration);
 
@@ -50,6 +64,8 @@ app.UseStaticFiles();
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowClientOrigin");
 
 app.UseAuthorization();
 

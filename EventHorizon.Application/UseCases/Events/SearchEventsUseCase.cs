@@ -4,7 +4,6 @@ using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Contracts.DTO;
 using EventHorizon.Contracts.Requests.Events;
 using EventHorizon.Contracts.Responses.Events;
-using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data;
 using Microsoft.Extensions.Options;
 
@@ -48,7 +47,7 @@ namespace EventHorizon.Application.UseCases.Events
                     e.Address.Contains(request.PlaceQuery) &&
                     e.DateTime.CompareTo(request.SearchFromDate.Value.ToDateTime(TimeOnly.Parse("00:00 AM"))) > 0 &&
                     e.DateTime.CompareTo(request.SearchUntilDate.Value.ToDateTime(TimeOnly.Parse("00:00 AM"))) < 0 &&
-                    (request.Categories == null ? true : request.Categories.Contains(e.CategoryId)),
+                    (request.Categories == null || request.Categories.FirstOrDefault() == null ? true : request.Categories.Contains(e.CategoryId)),
                 request.PageNumber,
                 _paginationOptions.PageSize,
                 cancellationToken

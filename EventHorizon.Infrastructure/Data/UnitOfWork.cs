@@ -1,4 +1,5 @@
 ﻿using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
+using System.Transactions;
 
 namespace EventHorizon.Infrastructure.Data
 {
@@ -25,7 +26,18 @@ namespace EventHorizon.Infrastructure.Data
 
         public void Save()
         {
-            _context.SaveChanges();
+            var tr = _context.Database.BeginTransaction();
+            try
+			{
+				_context.SaveChanges();
+                tr.Commit();
+            } catch
+			{
+				tr.Rollback();
+			}
+
+            //tr.Dispose();
+
         }
     }
 }

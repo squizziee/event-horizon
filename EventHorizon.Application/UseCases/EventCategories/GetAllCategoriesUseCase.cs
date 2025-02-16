@@ -27,9 +27,21 @@ namespace EventHorizon.Application.UseCases.EventCategories
 
         public async Task<GetAllCategoriesResponse> ExecuteAsync(GetAllCategoriesRequest request, CancellationToken cancellationToken)
         {
+            if (request.DoNotPaginate)
+            {
+                var npcategories = await _unitOfWork.Categories.GetAllAsync(cancellationToken);
+
+                return new GetAllCategoriesResponse
+                {
+                    PageNumber = -1,
+                    TotalPages = -1,
+                    Categories = npcategories.Select(_mapper.Map<EventCategoryDTO>)
+                };
+            }
+
             var categories = await _unitOfWork.Categories.GetAllAsync(
-                request.PageNumber, 
-                _paginationOptions.PageSize, 
+                request.PageNumber,
+                _paginationOptions.PageSize,
                 cancellationToken
             );
 

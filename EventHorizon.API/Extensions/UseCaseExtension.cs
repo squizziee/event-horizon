@@ -1,11 +1,13 @@
-﻿using EventHorizon.Application.UseCases.EventCategories;
+﻿using EventHorizon.Application.UseCases.Dev;
+using EventHorizon.Application.UseCases.EventCategories;
 using EventHorizon.Application.UseCases.EventEntries;
 using EventHorizon.Application.UseCases.Events;
+using EventHorizon.Application.UseCases.Interfaces.Dev;
 using EventHorizon.Application.UseCases.Interfaces.EventCategories;
 using EventHorizon.Application.UseCases.Interfaces.EventEntries;
 using EventHorizon.Application.UseCases.Interfaces.Events;
-using EventHorizon.Application.UseCases.Interfaces;
-using EventHorizon.Application.UseCases;
+using EventHorizon.Application.UseCases.Interfaces.Users;
+using EventHorizon.Application.UseCases.Users;
 
 namespace EventHorizon.API.Extensions
 {
@@ -40,6 +42,9 @@ namespace EventHorizon.API.Extensions
             services.AddScoped<IGetUserEntriesUseCase, GetUserEntriesUseCase>();
             services.AddScoped<IAddEventEntryUseCase, AddEventEntryUseCase>();
             services.AddScoped<IDeleteEventEntryUseCase, DeleteEventEntryUseCase>();
+
+            services.AddScoped<ICreateAdminUseCase, CreateAdminUseCase>();
+            services.AddScoped<ISeedDatabaseUseCase, SeedDatabaseUseCase>();
 
             return services;
         }
