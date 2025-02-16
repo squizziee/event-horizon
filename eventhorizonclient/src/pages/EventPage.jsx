@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App";
 import { useParams } from "react-router-dom";
-import { Backdrop, Button, Card, CardActions, CircularProgress, Container, Grid2, Stack, Typography } from "@mui/material";
+import { Backdrop, Button, Card, CardActions, CircularProgress, Container, Grid2, Pagination, Stack, Typography } from "@mui/material";
 import axiosClient from "../tools/axiosConfig";
 
 import 'swiper/css/bundle'
-import { A11y, Navigation, Pagination, Scrollbar } from "swiper/modules";
+import { A11y, Navigation, Scrollbar } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import formatTimestamp from "../tools/dateFormatter";
 import zIndex from "@mui/material/styles/zIndex";
@@ -77,7 +77,7 @@ function EventPage() {
                         <Swiper
                             style={{ maxWidth: "100%", maxHeight: "500px" }}
                             id="sadadasd"
-                            modules={[Navigation, Pagination, Scrollbar, A11y]}
+                            modules={[Navigation, Scrollbar, A11y]}
                             spaceBetween={0}
                             slidesPerView={1}
                             scrollbar={{ draggable: true }}
@@ -137,16 +137,7 @@ function EventPage() {
 
                         {
                             entries ?
-                                <Grid2 container spacing={2}>
-                                    {
-                                        entries.map((e, index) => (
-                                            <Grid2 item key={index} size={12}>
-                                                <ParticipantComponent entry={e} />
-                                            </Grid2>
-                                        ))
-                                    }
-
-                                </Grid2>
+                                <ParticipantComponent event_id={id} />
                                 :
                                 <div></div>
                         }
@@ -186,22 +177,71 @@ function EventPage() {
     );
 }
 
-function ParticipantComponent({ entry }) {
+function ParticipantComponent({ event_id }) {
+    const [pageNumber, setPageNumber] = useState(0)
+    const [totalPages, setTotalPages] = useState(0)
+    const [entries, setEntries] = useState(0)
+
+    function changePage(e, value) {
+        console.log(value);
+
+        setPageNumber(value - 1)
+    }
+
+    useEffect(() => {
+        axiosClient
+            .get(`entries/event/${event_id}?PageNumber=${pageNumber}`)
+            .then(response => response.data)
+            .then(data => {
+                console.log(data);
+                setPageNumber(data.pageNumber);
+                setTotalPages(data.totalPages)
+                setEntries(data.entries)
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }, [pageNumber])
+
     return (
-        <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)" }}>
-            <Grid2 container p={2}>
+        <Container container spacing={2}>
+            {
+                entries ?
+                    <Stack spacing={2}>
+                        {
+                            entries.map((entry, index) => (
+                                <Grid2 item key={index} size={12}>
+                                    <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)" }}>
+                                        <Grid2 container p={2}>
+                                            <Grid2 item>
+                                                <Typography variant="h6">
+                                                    {entry.user.firstName} {entry.user.lastName}&nbsp;–&nbsp;
+                                                </Typography>
+                                            </Grid2>
+                                            <Grid2 item>
+                                                <Typography variant="h6">
+                                                    {formatTimestamp(entry.submissionDate)}
+                                                </Typography>
+                                            </Grid2>
+                                        </Grid2>
+                                    </Card>
+                                </Grid2>
+                            ))
+                        }
+                    </Stack>
+
+                    :
+                    <CircularProgress />
+            }
+            <Grid2 container justifyContent={'center'}>
                 <Grid2 item>
-                    <Typography variant="h6">
-                        {entry.user.firstName} {entry.user.lastName}&nbsp;–&nbsp;
-                    </Typography>
+                    <Pagination style={{ paddingTop: "50px" }} count={totalPages} page={pageNumber + 1} onChange={changePage} />
                 </Grid2>
-                <Grid2 item>
-                    <Typography variant="h6">
-                        {formatTimestamp(entry.submissionDate)}
-                    </Typography>
-                </Grid2>
+
             </Grid2>
-        </Card>
+
+        </Container>
+
     );
 }
 

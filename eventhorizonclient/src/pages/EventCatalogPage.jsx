@@ -5,6 +5,7 @@ import { Box, Button, Card, CardMedia, Chip, CircularProgress, Container, FormCo
 import imagePlaceholder from "../misc/event_placeholder.bmp";
 import { DatePicker } from "@mui/lab";
 import Select from "react-select";
+import truncateDescription, { truncateName } from "../tools/textFormatter";
 
 function EventCatalogPage() {
     const { user, setUser } = useContext(UserContext)
@@ -108,9 +109,9 @@ function EventComponent({ event }) {
                         imagePlaceholder
                 }
             />
-            <Stack direction="column" spacing={0.5} p={2} useFlexGap>
+            <Stack direction="column" spacing={0.5} p={2} useFlexGap >
                 <Stack direction="row" spacing={2} useFlexGap alignItems='center'>
-                    <Typography variant="h5">{event.name}</Typography>
+                    <Typography variant="h5">{truncateName(event.name)}</Typography>
                     <Chip
                         size="small"
                         variant="filled"
@@ -118,9 +119,9 @@ function EventComponent({ event }) {
                         color='default'
                     />
                 </Stack>
-
-                <Typography variant="body2" sx={{ color: "GrayText" }}>{event.description}</Typography>
+                <Typography variant="body2" sx={{ color: "GrayText" }}>{truncateDescription(event.description)}</Typography>
                 <Typography variant="body2" sx={{ color: "GrayText" }}>Address: {event.address}</Typography>
+
                 <Grid2 container direction='row' justifyContent='space-between' alignItems='center'>
                     <Grid2 item>
                         <Chip
