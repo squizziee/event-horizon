@@ -30,12 +30,7 @@ namespace EventHorizon.Application.UseCases.Users
         // so it will just throw on duplicate email
         public async Task<(string, string)?> ExecuteAsync(RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            var validationResult = _validator.Validate(request);
-
-            if (!validationResult.IsValid)
-            {
-                throw new BadRequestException();
-            }
+            _validator.ValidateAndThrow(request);
 
             var newUser = new User
             {

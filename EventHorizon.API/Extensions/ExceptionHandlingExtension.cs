@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventHorizon.API.Extensions
 {
@@ -24,6 +25,7 @@ namespace EventHorizon.API.Extensions
             CancellationToken cancellationToken)
         {
             var status = StatusCodes.Status500InternalServerError;
+            string? message = null;
 
             if (exception is BadRequestException)
             {
@@ -53,11 +55,15 @@ namespace EventHorizon.API.Extensions
             {
                 status = StatusCodes.Status400BadRequest;
             }
+            else if (exception is FluentValidation.ValidationException vex)
+            {
+                status = StatusCodes.Status400BadRequest;
+            }
 
             var problemDetails = new ProblemDetails
             {
                 Status = status,
-                Title = exception.Message,
+                Title = message ?? exception.Message,
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

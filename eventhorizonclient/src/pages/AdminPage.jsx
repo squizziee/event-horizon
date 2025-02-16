@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App";
-import { Backdrop, Box, Button, Card, CardActions, CardMedia, Chip, CircularProgress, Container, FormControl, FormHelperText, Grid2, IconButton, Pagination, Stack, Tab, TextField, Typography } from "@mui/material";
+import { Backdrop, Box, Button, Card, CardActions, CardMedia, Checkbox, Chip, CircularProgress, Container, FormControl, FormControlLabel, FormHelperText, Grid2, IconButton, Pagination, Stack, Tab, TextField, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import axiosClient from "../tools/axiosConfig";
 import truncateDescription, { truncateName } from "../tools/textFormatter";
@@ -8,6 +8,8 @@ import imagePlaceholder from "../misc/event_placeholder.bmp";
 import { Delete, Settings, Visibility } from "@mui/icons-material";
 import Select from "react-select";
 import Dropzone from "react-dropzone";
+import { toast, ToastContainer } from "react-toastify";
+import formatErrors from "../tools/errorFormatter";
 
 function AdminPage() {
     const { user, setUser } = useContext(UserContext)
@@ -22,55 +24,6 @@ function AdminPage() {
 
     function handleTabChange(e, value) {
         setTab(value);
-    }
-
-    function handleLogin(formData) {
-        console.log(formData);
-
-        const tmp = new FormData();
-        tmp.append("Email", formData.get("Email"))
-        tmp.append("Password", formData.get("Password"))
-
-        axiosClient({
-            method: "POST",
-            url: "user/login",
-            data: tmp,
-            headers: { "Content-Type": "multipart/form-data" }
-        })
-            .then(_ => {
-                successRedirect();
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
-
-    function handleRegister(formData) {
-        axiosClient({
-            method: "POST",
-            url: "user/register",
-            data: formData,
-            headers: { "Content-Type": "multipart/form-data" }
-        })
-            .then(_ => {
-                successRedirect();
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
-
-    function handleLogout(formData) {
-        axiosClient({
-            method: "POST",
-            url: "user/logout",
-        })
-            .then(_ => {
-                successRedirect(true);
-            })
-            .catch(err => {
-                console.log(err);
-            })
     }
 
     function successRedirect(logout = false) {
@@ -112,6 +65,8 @@ function EventTab() {
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
 
+    const [editedEvent, setEditedEvent] = useState();
+
     function changePage(e, value) {
         console.log(value);
 
@@ -126,12 +81,12 @@ function EventTab() {
         setAddDialogOpened(false)
     }
 
-    function openEditDialog() {
-        setEditDialogOpened(true)
-    }
+    // function openEditDialog() {
+    //     setEditDialogOpened(true)
+    // }
 
     function closeEditDialog() {
-        setEditDialogOpened(false)
+        setEditedEvent(null)
     }
 
     useEffect(() => {
@@ -151,18 +106,24 @@ function EventTab() {
 
     return (
         <Stack direction="column">
-            <Button onClick={openAddDialog}>Add event</Button>
             <Backdrop open={addDialogOpened} sx={{ zIndex: 99999 }}>
                 <AddEventCard closeDialog={closeAddDialog} />
-                <Button onClick={closeAddDialog}>Add event</Button>
             </Backdrop>
+            {
+                editedEvent ?
+                    <Backdrop open={editedEvent != null} sx={{ zIndex: 99999 }}>
+                        <EditEventCard event={editedEvent} closeDialog={closeEditDialog} />
+                    </Backdrop>
+                    : null
+            }
+            <Button onClick={openAddDialog} sx={{ mb: 2 }}>Add event</Button>
             {
                 events ?
                     <Grid2 container spacing={2} justifyContent={'center'}>
                         {
                             events.map((e, index) => (
                                 <Grid2 size={12} item key={index}>
-                                    <EventListComponent event={e} />
+                                    <EventListComponent onDeleteCompleted={() => console.log("deleted")} onEditButtonPressed={() => setEditedEvent(e)} event={e} />
                                 </Grid2>
                             ))
                         }
@@ -202,6 +163,10 @@ function AddEventCard({ closeDialog }) {
             })
     }, [])
 
+    function notify(message, isError = false) {
+        toast(message)
+    }
+
     function handleAddEvent(e) {
         e.preventDefault();
 
@@ -219,9 +184,10 @@ function AddEventCard({ closeDialog }) {
         })
             .then(_ => {
                 closeDialog();
+                notify("Success!")
             })
             .catch(err => {
-                console.log(err);
+                notify("Error: " + formatErrors(err), true)
             })
     }
 
@@ -338,7 +304,7 @@ function AddEventCard({ closeDialog }) {
 
                         <CardActions sx={{ padding: 2 }}>
                             <Button type="submit">Proceed</Button>
-                            <Button color="error">Cancel</Button>
+                            <Button color="error" onClick={() => closeDialog()}>Cancel</Button>
                         </CardActions>
                     </form>
                 </Card>
@@ -349,9 +315,227 @@ function AddEventCard({ closeDialog }) {
     );
 }
 
-function EventListComponent({ event, onEditButtonPressed, onDeleteButtonPressed }) {
+function EditEventCard({ event, closeDialog }) {
+    const [categories, setCategories] = useState()
+    const [files, setFiles] = useState([])
+    const [deleteImages, setDeleteImages] = useState(false)
+
+    useEffect(() => {
+        axiosClient({
+            method: "GET",
+            url: "category?DoNotPaginate=true&PageNumber=0"
+        })
+            .then(response => response.data)
+            .then(data => {
+                var mapped = data.categories.map(c => ({ value: c.id, label: c.name }))
+                setCategories(mapped);
+            })
+            .catch(err => {
+                console.log(err);
+
+            })
+    }, [])
+
+    function notify(message, isError = false) {
+        toast(message)
+    }
+
+    function woop(e) {
+        setDeleteImages(e.target.checked);
+    }
+
+    function handleAddEvent(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+
+
+        formData.append("DeleteAllImages", deleteImages)
+
+        for (const image of files) {
+            formData.append("AttachedImages", image);
+        }
+
+        console.log(formData);
+        axiosClient({
+            method: "PUT",
+            url: `events/${event.id}`,
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" }
+        })
+            .then(_ => {
+                notify("Success!")
+                closeDialog();
+            })
+            .catch(err => {
+                notify("Error: " + formatErrors(err))
+            })
+    }
+
+    const jsdate = new Date(event.dateTime);
+
+    const normalizedDate = event.dateTime.split("T")[0]
+    const normalizedTime = `${jsdate.getHours() < 10 ? "0" + jsdate.getHours() : jsdate.getHours()}:${jsdate.getMinutes()}`
+
+    console.log(normalizedDate);
+
+
+    return (
+        categories ?
+            <Container maxWidth="sm">
+                <ToastContainer />
+                <Card style={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)", overflow: "visible" }}>
+                    <form onSubmit={handleAddEvent}>
+                        <Stack direction="column" p={2} spacing={1}>
+                            <FormControl fullWidth>
+                                <Select
+                                    name="CategoryId"
+                                    options={categories}
+                                    required
+                                    value={{ value: event.category.id, label: event.category.name }}
+                                />
+                                <FormHelperText>
+                                    Event category
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={event.name.trim()}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    size="small"
+                                    name="Name"
+                                    label="Name"
+                                />
+                                <FormHelperText>
+                                    Event name
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={event.description.trim()}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    multiline
+                                    rows={4}
+                                    size="small"
+                                    name="Description"
+                                    label="Description"
+                                />
+                                <FormHelperText>
+                                    Event description
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={event.address.trim()}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    multiline
+                                    rows={2}
+                                    size="small"
+                                    name="Address"
+                                    label="Address"
+                                />
+                                <FormHelperText>
+                                    Event address
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={normalizedDate}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    type="date"
+                                    size="small"
+                                    name="Date"
+                                />
+                                <FormHelperText>
+                                    Event date
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={normalizedTime}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    type="time"
+                                    size="small"
+                                    name="Time"
+                                />
+                                <FormHelperText>
+                                    Event time (UTC)
+                                </FormHelperText>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <TextField
+                                    defaultValue={event.maxParticipantCount}
+                                    sx={{ zIndex: 0 }}
+                                    required
+                                    type="number"
+                                    size="small"
+                                    name="MaxParticipantCount"
+                                />
+                                <FormHelperText>
+                                    Maximum participants allowed in event
+                                </FormHelperText>
+                            </FormControl>
+                            {
+                                deleteImages ?
+                                    null
+                                    :
+                                    <FormControl fullWidth>
+                                        <Box sx={{ border: "0.5px solid rgba(0, 0, 0, .20)", borderRadius: "4px", padding: "0 20px", cursor: "pointer" }}>
+                                            <Dropzone maxFiles={5} onDrop={acceptedFiles => setFiles(acceptedFiles)}>
+                                                {({ getRootProps, getInputProps }) => (
+                                                    <section>
+                                                        <div {...getRootProps()}>
+                                                            <input {...getInputProps()} />
+                                                            <p>Click to select images ({files.length} selected)</p>
+                                                        </div>
+                                                    </section>
+                                                )}
+                                            </Dropzone>
+                                        </Box>
+
+                                        <FormHelperText>
+                                            Event images (up to 5). All previous images will be wiped out
+                                        </FormHelperText>
+                                    </FormControl>
+                            }
+
+                            <FormControlLabel onChange={woop} control={<Checkbox name="DeleteImages" />} label="Delete images" />
+                        </Stack>
+
+                        <CardActions sx={{ padding: 2 }}>
+                            <Button type="submit">Proceed</Button>
+                            <Button color="error" onClick={() => closeDialog()}>Cancel</Button>
+                        </CardActions>
+                    </form>
+                </Card>
+            </Container>
+
+            :
+            <CircularProgress />
+    );
+}
+
+function EventListComponent({ event, onEditButtonPressed, onDeleteCompleted }) {
     var labelColor = event.currentParticipantCount == event.maxParticipantCount ?
         "error" : "primary";
+
+    function handleDeleteEvent() {
+        axiosClient({
+            method: "DELETE",
+            url: `events/${event.id}`
+        })
+            .then(_ => {
+                onDeleteCompleted();
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
 
     return (
         <Card style={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)" }}>
@@ -388,10 +572,10 @@ function EventListComponent({ event, onEditButtonPressed, onDeleteButtonPressed 
                         />
                     </Grid2>
                     <Grid2 item>
-                        <IconButton onClick={() => window.location.href = `/event/${event.id}`}>
+                        <IconButton onClick={handleDeleteEvent}>
                             <Delete style={{ fontSize: 20 }} />
                         </IconButton>
-                        <IconButton onClick={() => window.location.href = `/event/${event.id}`}>
+                        <IconButton onClick={() => onEditButtonPressed()}>
                             <Settings style={{ fontSize: 20 }} />
                         </IconButton>
                         <IconButton onClick={() => window.location.href = `/event/${event.id}`}>

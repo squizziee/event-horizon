@@ -21,12 +21,7 @@ namespace EventHorizon.Application.UseCases.EventCategories
 
         public async Task ExecuteAsync(Guid id, UpdateCategoryRequest request, CancellationToken cancellationToken)
         {
-            var validationResult = _validator.Validate(request);
-
-            if (!validationResult.IsValid)
-            {
-                throw new BadRequestException();
-            }
+            _validator.ValidateAndThrow(request);
 
             var tryFind = await _unitOfWork.Categories.GetByIdAsync(id, cancellationToken);
 

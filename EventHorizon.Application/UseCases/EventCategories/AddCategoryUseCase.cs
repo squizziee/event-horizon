@@ -21,12 +21,7 @@ namespace EventHorizon.Application.UseCases.EventCategories
 
         public async Task ExecuteAsync(AddCategoryRequest request, CancellationToken cancellationToken)
         {
-            var validationResult = _validator.Validate(request);
-
-            if (!validationResult.IsValid)
-            {
-                throw new BadRequestException();
-            }
+            _validator.ValidateAndThrow(request);
 
             var newCategory = new EventCategory
             {

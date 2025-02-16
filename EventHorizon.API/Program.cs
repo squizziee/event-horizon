@@ -1,5 +1,6 @@
 using EventHorizon.API.Extensions;
 using EventHorizon.Infrastructure.Data;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,11 @@ builder.Services.AddCors(options =>
         }
     );
 });
+
+ValidatorOptions.Global.DisplayNameResolver = (type, member, expression) =>
+{
+    return null;
+};
 
 builder.Services.AddDatabaseContext(builder.Configuration);
 

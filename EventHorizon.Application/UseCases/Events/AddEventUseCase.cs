@@ -30,14 +30,9 @@ namespace EventHorizon.Application.UseCases.Events
 
 		public async Task ExecuteAsync(AddEventRequest request, CancellationToken cancellationToken)
 		{
-			var validationResult = _validator.Validate(request);
+			_validator.ValidateAndThrow(request);
 
-			if (!validationResult.IsValid)
-			{
-				throw new BadRequestException();
-			}
-
-			var tryFindCategory = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId, cancellationToken);
+            var tryFindCategory = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId, cancellationToken);
 
 			if (tryFindCategory == null)
 			{

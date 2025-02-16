@@ -30,12 +30,7 @@ namespace EventHorizon.Application.UseCases.Events
 
         public async Task ExecuteAsync(Guid id, UpdateEventRequest request, CancellationToken cancellationToken)
         {
-            var validationResult = _validator.Validate(request);
-
-            if (!validationResult.IsValid)
-            {
-                throw new BadRequestException();
-            }
+            _validator.ValidateAndThrow(request);
 
             var tryFindCategory = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId, cancellationToken);
 
@@ -71,7 +66,7 @@ namespace EventHorizon.Application.UseCases.Events
 
             var imageUrls = new List<string>();
 
-            if (request.AttachedImages != null)
+            if (request.AttachedImages != null && !request.DeleteAllImages)
             {
                 foreach (var file in request.AttachedImages)
                 {
