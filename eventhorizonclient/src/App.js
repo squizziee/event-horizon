@@ -54,8 +54,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/">
-            <Route index element={<HomePage />} />
-            <Route path='catalog' element={<EventCatalogPage />} />
+            <Route index element={<EventCatalogPage />} />
             <Route path='auth' element={<AuthPage />} />
             <Route path='profile' element={<ProfilePage />} />
             <Route path='event/:id' element={<EventPage />} />

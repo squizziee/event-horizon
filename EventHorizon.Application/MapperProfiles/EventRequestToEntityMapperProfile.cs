@@ -10,7 +10,8 @@ namespace EventHorizon.Application.MapperProfiles
         {
             CreateMap<AddEventRequest, Event>()
                 .ForMember(dest => dest.DateTime, opt => opt.MapFrom<DateResolver>());
-            CreateMap<UpdateEventRequest, Event>();
+            CreateMap<UpdateEventRequest, Event>()
+                .ForMember(dest => dest.DateTime, opt => opt.MapFrom<DateResolver2>());
         }
     }
 
@@ -23,7 +24,22 @@ namespace EventHorizon.Application.MapperProfiles
             DateTime destMember, 
             ResolutionContext context)
         {
-            return new DateTime(source.Date, source.Time, DateTimeKind.Utc);
+            var date = new DateTime(source.Date, source.Time, DateTimeKind.Utc);
+            return date;
+        }
+    }
+
+    public class DateResolver2 : IValueResolver<UpdateEventRequest, Event, DateTime>
+    {
+
+        public DateTime Resolve(
+            UpdateEventRequest source,
+            Event destination,
+            DateTime destMember,
+            ResolutionContext context)
+        {
+            var date = new DateTime(source.Date, source.Time, DateTimeKind.Utc);
+            return date;
         }
     }
 }

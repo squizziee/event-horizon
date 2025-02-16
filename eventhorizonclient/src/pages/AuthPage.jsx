@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
-import { Box, Button, Card, CircularProgress, Container, Grid2, Stack, Tab, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CircularProgress, Container, FormControl, FormHelperText, Grid2, Stack, Tab, TextField, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import axiosClient from "../tools/axiosConfig";
 import axios from "axios";
@@ -66,7 +66,7 @@ function AuthPage() {
 
     function successRedirect(logout = false) {
         if (logout) window.location.href = "/auth"
-        else window.location.href = "/catalog"
+        else window.location.href = "/"
     }
 
     return (
@@ -101,23 +101,35 @@ function AuthPage() {
                     <TabPanel value="1">
                         <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)" }}>
                             <Stack direction="column" p={2}>
-                                <Typography variant="h5" sx={{ marginBottom: 1 }}>Login</Typography>
+
                                 <Stack direction="column" spacing={1.5}>
                                     <form action={handleLogin}>
                                         <Stack direction="column" spacing={1.5}>
-                                            <TextField
-                                                required
-                                                size="small"
-                                                label="Email"
-                                                name="Email"
-                                            />
-                                            <TextField
-                                                required
-                                                size="small"
-                                                type="password"
-                                                label="Password"
-                                                name="Password"
-                                            />
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    label="Email"
+                                                    name="Email"
+                                                />
+                                                <FormHelperText>
+                                                    Account email
+                                                </FormHelperText>
+                                            </FormControl>
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    type="password"
+                                                    label="Password"
+                                                    name="Password"
+                                                />
+                                                <FormHelperText>
+                                                    Account password
+                                                </FormHelperText>
+                                            </FormControl>
+
+
                                             <Button type="submit" variant="contained" disableElevation>
                                                 Proceed
                                             </Button>
@@ -131,41 +143,68 @@ function AuthPage() {
                     <TabPanel value="2">
                         <Card sx={{ boxShadow: "0 0 20px rgba(0, 0, 0, .075)" }}>
                             <Stack direction="column" p={2}>
-                                <Typography variant="h5" sx={{ marginBottom: 1 }}>Register</Typography>
                                 <Stack direction="column" spacing={1.5}>
                                     <form action={handleRegister}>
                                         <Stack direction="column" spacing={1.5}>
-                                            <TextField
-                                                required
-                                                size="small"
-                                                label="Email"
-                                                name="Email"
-                                            />
-                                            <TextField
-                                                required
-                                                size="small"
-                                                type="password"
-                                                label="Password"
-                                                name="Password"
-                                            />
-                                            <TextField
-                                                required
-                                                size="small"
-                                                label="First name"
-                                                name="FirstName"
-                                            />
-                                            <TextField
-                                                required
-                                                size="small"
-                                                label="Last name"
-                                                name="LastName"
-                                            />
-                                            <TextField
-                                                required
-                                                type="date"
-                                                size="small"
-                                                name="DateOfBirth"
-                                            />
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    label="Email"
+                                                    name="Email"
+                                                />
+                                                <FormHelperText>
+                                                    Account email
+                                                </FormHelperText>
+                                            </FormControl>
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    type="password"
+                                                    label="Password"
+                                                    name="Password"
+                                                />
+                                                <FormHelperText>
+                                                    Account password
+                                                </FormHelperText>
+                                            </FormControl>
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    label="First name"
+                                                    name="FirstName"
+                                                />
+                                                <FormHelperText>
+                                                    First name (public information)
+                                                </FormHelperText>
+                                            </FormControl>
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    size="small"
+                                                    label="Last name"
+                                                    name="LastName"
+                                                />
+                                                <FormHelperText>
+                                                    Last name (public information)
+                                                </FormHelperText>
+                                            </FormControl>
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    required
+                                                    type="date"
+                                                    size="small"
+                                                    name="DateOfBirth"
+                                                />
+                                                <FormHelperText>
+                                                    Birth date
+                                                </FormHelperText>
+                                            </FormControl>
+
+
+
                                             <Button type="submit" variant="contained" disableElevation>
                                                 Proceed
                                             </Button>

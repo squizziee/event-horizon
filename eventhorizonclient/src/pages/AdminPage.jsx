@@ -26,30 +26,12 @@ function AdminPage() {
         setTab(value);
     }
 
-    function successRedirect(logout = false) {
-        if (logout) window.location.href = "/auth"
-        else window.location.href = "/catalog"
-    }
-
     return (
 
         <Container maxWidth="sm" sx={{ margin: "50px auto" }}>
             <TabContext value={tab}>
                 <Box>
-                    <TabList onChange={handleTabChange} aria-label="lab API tabs example" centered>
-                        <Tab label="Categories" value="1" />
-                        <Tab label="Events" value="2" />
-                        <Tab label="Entires" value="3" />
-                    </TabList>
-                    <TabPanel value="1">
-
-                    </TabPanel>
-                    <TabPanel value="2">
-                        <EventTab />
-                    </TabPanel>
-                    <TabPanel value="3">
-
-                    </TabPanel>
+                    <EventTab />
                 </Box>
             </TabContext>
 

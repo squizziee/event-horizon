@@ -1,5 +1,4 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Users;
-using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Infrastructure.Data;
@@ -14,6 +13,7 @@ namespace EventHorizon.Application.UseCases.Users
         private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
         private readonly IValidator<RegisterUserRequest> _validator;
+
         public RegisterUserUseCase(
             IUnitOfWork unitOfWork,
             ITokenService tokenService,
