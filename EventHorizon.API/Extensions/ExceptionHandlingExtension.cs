@@ -23,7 +23,7 @@ namespace EventHorizon.API.Extensions
             Exception exception,
             CancellationToken cancellationToken)
         {
-            var status = StatusCodes.Status418ImATeapot;
+            var status = StatusCodes.Status500InternalServerError;
 
             if (exception is BadRequestException)
             {
@@ -49,7 +49,7 @@ namespace EventHorizon.API.Extensions
             {
                 status = StatusCodes.Status409Conflict;
             }
-            else
+            else if (exception is ArgumentException)
             {
                 status = StatusCodes.Status400BadRequest;
             }

@@ -12,6 +12,7 @@ import AuthPage from './pages/AuthPage';
 import axiosClient from './tools/axiosConfig';
 import ProfilePage from './pages/ProfilePage';
 import EventPage from './pages/EventPage';
+import AdminPage from './pages/AdminPage';
 
 
 export const UserContext = React.createContext(null);
@@ -58,6 +59,7 @@ function App() {
             <Route path='auth' element={<AuthPage />} />
             <Route path='profile' element={<ProfilePage />} />
             <Route path='event/:id' element={<EventPage />} />
+            <Route path='admin' element={<AdminPage />} />
           </Route>
         </Routes>
       </UserContext.Provider>

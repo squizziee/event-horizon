@@ -19,8 +19,12 @@ namespace EventHorizon.Application.Validation
             RuleFor(r => r.MaxParticipantCount)
                 .GreaterThan(0);
 
-            RuleFor(r => r.DateTime)
-                .Must(dt => dt.CompareTo(DateTime.Now) > 0);
+            RuleFor(r => r.Date)
+                .Must(d => d.CompareTo(DateOnly.FromDateTime(DateTime.Now)) > 0);
+
+            RuleFor(r => r.Time)
+                .Must(t => t.CompareTo(TimeOnly.FromDateTime(DateTime.Now)) > 0)
+                .When(r => r.Date.CompareTo(DateOnly.FromDateTime(DateTime.Now)) == 0);
         }
     }
 }
