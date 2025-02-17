@@ -1,7 +1,7 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.EventEntries;
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
 
 namespace EventHorizon.Application.UseCases.EventEntries
 {

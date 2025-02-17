@@ -1,6 +1,6 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Dev;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
 using EventHorizon.Infrastructure.Helpers;
 using EventHorizon.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;

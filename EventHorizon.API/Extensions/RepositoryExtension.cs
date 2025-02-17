@@ -1,6 +1,6 @@
-﻿using EventHorizon.Infrastructure.Data;
+﻿using EventHorizon.Domain.Interfaces.Repositories;
+using EventHorizon.Infrastructure.Data;
 using EventHorizon.Infrastructure.Data.Repositories;
-using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
 
 namespace EventHorizon.API.Extensions
 {

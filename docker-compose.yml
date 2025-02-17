@@ -1,12 +1,11 @@
 services:
-  # client:
-  #   image: ${DOCKER_REGISTRY-}eventhorizonclient
-  #   build:
-  #     context: eventhorizonclient
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-
+  client:
+    image: ${DOCKER_REGISTRY-}eventhorizonclient
+    build:
+      context: eventhorizonclient
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
   eventhorizon.api:
     image: ${DOCKER_REGISTRY-}eventhorizonapi
     build:

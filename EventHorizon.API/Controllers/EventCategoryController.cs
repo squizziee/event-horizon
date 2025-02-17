@@ -1,8 +1,6 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.EventCategories;
 using EventHorizon.Contracts.Requests.EventCategories;
-using EventHorizon.Contracts.Requests.Events;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventHorizon.API.Controllers
@@ -51,8 +49,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> AddCategory(
             [FromForm] AddCategoryRequest request,
             CancellationToken cancellationToken)
@@ -62,8 +59,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPut("{Id}")]
-        //[Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> UpdateCategory(
             [FromRoute] Guid Id,
             [FromForm] UpdateCategoryRequest request,
@@ -74,8 +70,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpDelete("{Id}")]
-        //[Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> DeleteCategory(
             [FromRoute] Guid Id,
             CancellationToken cancellationToken)

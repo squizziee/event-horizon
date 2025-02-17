@@ -1,7 +1,8 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Users;
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 using EventHorizon.Infrastructure.Services.Interfaces;
 
 namespace EventHorizon.Application.UseCases.Users

@@ -66,7 +66,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> AddEvent(
             [FromForm] AddEventRequest request,
             CancellationToken cancellationToken)
@@ -77,7 +77,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPut("{Id}")]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> UpdateEvent(
             [FromRoute] Guid Id,
             [FromForm] UpdateEventRequest request,
@@ -89,7 +89,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpDelete("{Id}")]
-        [Authorize(Policy = "ViewerPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> DeleteEvent(
             [FromRoute] Guid Id,
             CancellationToken cancellationToken)

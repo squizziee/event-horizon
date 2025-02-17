@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App";
-import { Backdrop, Box, Button, Card, CardActions, CardMedia, Checkbox, Chip, CircularProgress, Container, FormControl, FormControlLabel, FormHelperText, Grid2, IconButton, Pagination, Stack, Tab, TextField, Typography } from "@mui/material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Backdrop, Box, Button, Card, CardActions, CardMedia, Checkbox, Chip, CircularProgress, Container, FormControl, FormControlLabel, FormHelperText, Grid2, IconButton, Pagination, Stack, TextField, Typography } from "@mui/material";
+import { TabContext } from "@mui/lab";
 import axiosClient from "../tools/axiosConfig";
 import truncateDescription, { truncateName } from "../tools/textFormatter";
 import imagePlaceholder from "../misc/event_placeholder.bmp";
@@ -22,18 +22,19 @@ function AdminPage() {
         })
     })
 
-    function handleTabChange(e, value) {
-        setTab(value);
-    }
-
     return (
 
         <Container maxWidth="sm" sx={{ margin: "50px auto" }}>
-            <TabContext value={tab}>
-                <Box>
-                    <EventTab />
-                </Box>
-            </TabContext>
+            {
+                user && user.role == "Admin" ?
+                    <TabContext value={tab}>
+                        <Box>
+                            <EventTab />
+                        </Box>
+                    </TabContext>
+                    : null
+            }
+
 
         </Container>
     );
@@ -45,7 +46,6 @@ function EventTab() {
     const [events, setEvents] = useState()
 
     const [addDialogOpened, setAddDialogOpened] = useState(false);
-    const [editDialogOpened, setEditDialogOpened] = useState(false);
 
     const [editedEvent, setEditedEvent] = useState();
 
@@ -62,10 +62,6 @@ function EventTab() {
     function closeAddDialog() {
         setAddDialogOpened(false)
     }
-
-    // function openEditDialog() {
-    //     setEditDialogOpened(true)
-    // }
 
     function closeEditDialog() {
         setEditedEvent(null)

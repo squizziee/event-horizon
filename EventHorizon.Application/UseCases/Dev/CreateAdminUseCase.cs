@@ -1,13 +1,14 @@
 ﻿using EventHorizon.Application.Helpers;
 using EventHorizon.Application.UseCases.Interfaces.Dev;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 using EventHorizon.Infrastructure.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace EventHorizon.Application.UseCases.Dev
 {
-	public class CreateAdminUseCase : ICreateAdminUseCase
+    public class CreateAdminUseCase : ICreateAdminUseCase
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IPasswordService _passwordService;

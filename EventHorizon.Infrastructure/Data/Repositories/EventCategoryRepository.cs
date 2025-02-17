@@ -1,7 +1,6 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
-using System;
+using EventHorizon.Domain.Interfaces.Repositories;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {

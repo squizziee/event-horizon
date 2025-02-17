@@ -13,10 +13,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using EventHorizon.Domain.Entities;
+using EventHorizon.Domain.Interfaces.Repositories;
 
 namespace EventHorizon.Tests
 {
-	public class TestEventRepository
+    public class TestEventRepository
 	{
 		private DatabaseContext _context;
 		private IUnitOfWork _unitOfWork;

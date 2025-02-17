@@ -7,10 +7,12 @@ using EventHorizon.Application.Validation;
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests.Events;
 using EventHorizon.Domain.Entities;
+using EventHorizon.Domain.Interfaces.Repositories;
 using EventHorizon.Infrastructure.Data;
 using EventHorizon.Infrastructure.Data.Repositories;
 using EventHorizon.Infrastructure.Helpers;
 using EventHorizon.Infrastructure.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -373,7 +375,8 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "test_event_desc",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = categoryId,
             };
@@ -394,14 +397,15 @@ namespace EventHorizon.Tests
                 Name = "",
                 Description = "test_event_desc",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = categoryId,
             };
 
             var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
             Assert.True(_context.Events.Count() == 10);
         }
 
@@ -415,14 +419,15 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = categoryId,
             };
 
             var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
             Assert.True(_context.Events.Count() == 10);
         }
 
@@ -436,14 +441,15 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "test_event_desc",
                 Address = "",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = categoryId,
             };
 
             var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
             Assert.True(_context.Events.Count() == 10);
         }
 
@@ -457,14 +463,15 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "test_event_desc",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now,
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Time = TimeOnly.FromDateTime(DateTime.Now),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = categoryId,
             };
 
             var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
             Assert.True(_context.Events.Count() == 10);
         }
 
@@ -478,14 +485,15 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "test_event_desc",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 0,
                 CategoryId = categoryId,
             };
 
             var exception = await Record.ExceptionAsync(async () => await _addEventUseCase.ExecuteAsync(addEventRequest, CancellationToken.None));
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
             Assert.True(_context.Events.Count() == 10);
         }
 
@@ -499,7 +507,8 @@ namespace EventHorizon.Tests
                 Name = "test_event",
                 Description = "test_event_desc",
                 Address = "test_event_addr",
-                DateTime = DateTime.Now.AddDays(77),
+                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(77)),
+                Time = TimeOnly.FromDateTime(DateTime.Now.AddDays(77)),
                 MaxParticipantCount = 1000 + 77,
                 CategoryId = Guid.NewGuid(),
             };
@@ -524,7 +533,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "update",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 23,
                 CategoryId = categoryId,
             };
@@ -558,7 +568,8 @@ namespace EventHorizon.Tests
                 Name = "",
                 Description = "update",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 23,
                 CategoryId = categoryId,
             };
@@ -567,7 +578,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 
@@ -592,7 +603,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 23,
                 CategoryId = categoryId,
             };
@@ -601,7 +613,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 
@@ -626,7 +638,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "update",
                 Address = "",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 23,
                 CategoryId = categoryId,
             };
@@ -635,7 +648,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 
@@ -660,7 +673,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "update",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 23,
                 CategoryId = categoryId,
             };
@@ -669,7 +683,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 
@@ -694,7 +708,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "update",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 0,
                 CategoryId = categoryId,
             };
@@ -703,7 +718,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 
@@ -728,7 +743,8 @@ namespace EventHorizon.Tests
                 Name = "update",
                 Description = "update",
                 Address = "update",
-                DateTime = time,
+                Date = DateOnly.FromDateTime(time),
+                Time = TimeOnly.FromDateTime(time),
                 MaxParticipantCount = 0,
                 CategoryId = Guid.NewGuid(),
             };
@@ -737,7 +753,7 @@ namespace EventHorizon.Tests
                 async () => await _updateEventUseCase.ExecuteAsync(eventId, updateEventRequest, CancellationToken.None)
             );
 
-            Assert.True(exception is BadRequestException);
+            Assert.True(exception is ValidationException);
 
             var supposedToChange = _context.Events.Where(e => e.Id == eventId).First();
 

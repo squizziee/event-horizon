@@ -3,7 +3,8 @@ using EventHorizon.Application.UseCases.Interfaces.Users;
 using EventHorizon.Contracts.DTO;
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Responses;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 
 namespace EventHorizon.Application.UseCases.Users
 {

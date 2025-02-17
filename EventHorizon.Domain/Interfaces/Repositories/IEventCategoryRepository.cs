@@ -1,6 +1,6 @@
 ﻿using EventHorizon.Domain.Entities;
 
-namespace EventHorizon.Infrastructure.Data.Repositories.Interfaces
+namespace EventHorizon.Domain.Interfaces.Repositories
 {
     public interface IEventCategoryRepository : IRepository<EventCategory>, IPaginatableRepository<EventCategory>
     {

@@ -3,13 +3,14 @@ using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests.Events;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 using EventHorizon.Infrastructure.Services.Interfaces;
 using FluentValidation;
 
 namespace EventHorizon.Application.UseCases.Events
 {
-	public class UpdateEventUseCase : IUpdateEventUseCase
+    public class UpdateEventUseCase : IUpdateEventUseCase
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IImageService _imageService;

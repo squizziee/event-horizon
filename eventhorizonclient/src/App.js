@@ -31,7 +31,7 @@ function App() {
         setUser(data.user)
         setUserLoading(false);
       })
-      .catch(err => {
+      .catch(_ => {
         axiosClient({
           method: "POST",
           url: "user/refresh"
@@ -41,7 +41,7 @@ function App() {
             setUser(data.user)
             setUserLoading(false);
           })
-          .catch(err => {
+          .catch(_ => {
             setUser(null)
             setUserLoading(false);
           })

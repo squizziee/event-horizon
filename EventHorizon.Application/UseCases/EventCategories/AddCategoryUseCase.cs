@@ -2,7 +2,8 @@
 using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Contracts.Requests.EventCategories;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 using FluentValidation;
 
 namespace EventHorizon.Application.UseCases.EventCategories

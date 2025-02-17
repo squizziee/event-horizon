@@ -4,7 +4,8 @@ using EventHorizon.Application.UseCases.Interfaces.EventCategories;
 using EventHorizon.Contracts.DTO;
 using EventHorizon.Contracts.Requests.EventCategories;
 using EventHorizon.Contracts.Responses.EventCategories;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
+
 using Microsoft.Extensions.Options;
 
 namespace EventHorizon.Application.UseCases.EventCategories

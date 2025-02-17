@@ -1,4 +1,4 @@
-﻿namespace EventHorizon.Infrastructure.Data
+﻿namespace EventHorizon.Domain.Interfaces.Repositories
 {
     public record PaginatedEnumerable<TEntity>
     {

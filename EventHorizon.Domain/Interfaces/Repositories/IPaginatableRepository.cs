@@ -1,4 +1,4 @@
-﻿namespace EventHorizon.Infrastructure.Data.Repositories.Interfaces
+﻿namespace EventHorizon.Domain.Interfaces.Repositories
 {
     public interface IPaginatableRepository<TEntity>
     {

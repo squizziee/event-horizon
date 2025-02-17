@@ -1,6 +1,6 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Events;
 using EventHorizon.Contracts.Exceptions;
-using EventHorizon.Infrastructure.Data;
+using EventHorizon.Domain.Interfaces.Repositories;
 using EventHorizon.Infrastructure.Services.Interfaces;
 
 namespace EventHorizon.Application.UseCases.Events

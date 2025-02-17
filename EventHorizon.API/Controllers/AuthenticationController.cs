@@ -1,5 +1,6 @@
 ﻿using EventHorizon.Application.UseCases.Interfaces.Users;
 using EventHorizon.Contracts.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -87,6 +88,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize(Policy = "ViewerPolicy")]
         public async Task<IActionResult> Logout()
         {
             Response.Cookies.Append("accessToken", "");
@@ -96,6 +98,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpPost("refresh")]
+        [Authorize(Policy = "ViewerPolicy")]
         public async Task<IActionResult> RefreshTokens(
             CancellationToken cancellationToken)
         {
@@ -130,6 +133,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpGet("me")]
+        [Authorize(Policy = "ViewerPolicy")]
         public async Task<IActionResult> GetMe(
             CancellationToken cancellationToken)
         {
@@ -146,6 +150,7 @@ namespace EventHorizon.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> GetAllUsers(
             CancellationToken cancellationToken)
         {

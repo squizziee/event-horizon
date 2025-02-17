@@ -1,6 +1,6 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
-using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
+using EventHorizon.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 

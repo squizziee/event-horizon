@@ -1,9 +1,8 @@
-﻿using EventHorizon.Infrastructure.Data.Repositories.Interfaces;
-using System.Transactions;
+﻿using EventHorizon.Domain.Interfaces.Repositories;
 
 namespace EventHorizon.Infrastructure.Data
 {
-	public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
 	{
 		private readonly DatabaseContext _context;	
 		public IUserRepository Users {  get; set; }
@@ -24,20 +23,32 @@ namespace EventHorizon.Infrastructure.Data
 			Categories = eventCategoryRepository;
 		}
 
-        public void Save()
+        public bool Save()
         {
-            var tr = _context.Database.BeginTransaction();
-            try
+			// outer catch is for testing purposes because in-memory DBs
+			// do not support transactions
+			try
+			{
+				var tr = _context.Database.BeginTransaction();
+				try
+				{
+					_context.SaveChanges();
+					tr.Commit();
+				}
+				catch
+				{
+					tr.Rollback();
+					return false;
+				}
+
+				return true;
+			}
+			catch (Exception)
 			{
 				_context.SaveChanges();
-                tr.Commit();
-            } catch
-			{
-				tr.Rollback();
 			}
 
-            //tr.Dispose();
-
+			return true;
         }
     }
 }

@@ -4,6 +4,8 @@ import { Box, Button, Card, CircularProgress, Container, FormControl, FormHelper
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import axiosClient from "../tools/axiosConfig";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import formatErrors from "../tools/errorFormatter";
 
 function AuthPage() {
     const { user, setUser } = useContext(UserContext)
@@ -32,6 +34,7 @@ function AuthPage() {
                 successRedirect();
             })
             .catch(err => {
+                notify(formatErrors(err), true)
                 console.log(err);
             })
     }
@@ -47,6 +50,7 @@ function AuthPage() {
                 successRedirect();
             })
             .catch(err => {
+                notify(formatErrors(err), true)
                 console.log(err);
             })
     }
@@ -64,6 +68,10 @@ function AuthPage() {
             })
     }
 
+    function notify(message, isError = false) {
+        toast((isError ? "Error: " : "") + message)
+    }
+
     function successRedirect(logout = false) {
         if (logout) window.location.href = "/auth"
         else window.location.href = "/"
@@ -72,6 +80,7 @@ function AuthPage() {
     return (
 
         <Container maxWidth="sm" sx={{ margin: "50px auto" }}>
+            <ToastContainer />
             <TabContext value={user ? "3" : tab}>
                 <Box>
                     <TabList onChange={handleTabChange} aria-label="lab API tabs example" centered>
