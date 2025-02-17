@@ -66,6 +66,7 @@ Installing the project is really straightforward:
    cd event-horizon
    docker-compose up -d
 3. Wait for completion
+4. Ensure all containers are running. If not, launch idle containers
 
 <!-- USAGE EXAMPLES -->
 ## Usage
