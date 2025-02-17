@@ -25,7 +25,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-This is apprenticeship application project for Modsen Inc. Server code is alright, client is a bit laggy and buggy, but still usable
+This is apprenticeship application project for Modsen Inc. Server code is alright, client is a bit laggy and buggy, but still usable.
 
 ### Built With
 
@@ -82,8 +82,8 @@ After Docker container initialization is done, Swagger client will be available 
 * Use endpoints, have fun :)
 
 ### Option 2: use React Client
-After Docker container initialization is done, REact client will be available at `http://localhost:3000`. Make sure to wait a fat minute 
-when opening client for the first time as it takes its time to load. To test project API. Admin creation and seeding can still be done only through Swagger/Postman/Insomnia.
+After Docker container initialization is done, React client will be available at `http://localhost:3000`. Make sure to wait for a fat minute 
+when opening client for the first time as it takes its time to load. To test project API. Admin creation and seeding can be done only through Swagger/Postman/Insomnia.
 Data mutation can still be done through React client with administaror credentials at `http://localhost:3000/admin`
 
 
