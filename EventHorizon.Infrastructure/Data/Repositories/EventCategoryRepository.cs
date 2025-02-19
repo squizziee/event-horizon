@@ -1,6 +1,7 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {
@@ -66,11 +67,12 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             );
         }
 
-        public Task<EventCategory?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<EventCategory?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-                _context.EventCategories.FirstOrDefault(u => u.Id == id)
-            );
+            var result = await _context.EventCategories
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+            return result;
         }
 
         public Task<PaginatedEnumerable<EventCategory>> GetFilteredAsync(
@@ -117,7 +119,8 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
         public async Task UpdateAsync(EventCategory entity, CancellationToken cancellationToken)
         {
-            var tryFind = _context.EventCategories.FirstOrDefault(u => u.Id == entity.Id);
+            var tryFind = await _context.EventCategories
+                .FirstOrDefaultAsync(u => u.Id == entity.Id, cancellationToken);
 
             if (tryFind == null)
             {

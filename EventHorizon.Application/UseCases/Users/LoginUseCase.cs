@@ -25,7 +25,7 @@ namespace EventHorizon.Application.UseCases.Users
 
         public async Task<(string, string)?> ExecuteAsync(LoginRequest request, CancellationToken cancellationToken)
         {
-            var tryFind = await _unitOfWork.Users.FindByEmail(request.Email);
+            var tryFind = await _unitOfWork.Users.FindByEmailAsync(request.Email, cancellationToken);
 
             if (tryFind == null)
             {

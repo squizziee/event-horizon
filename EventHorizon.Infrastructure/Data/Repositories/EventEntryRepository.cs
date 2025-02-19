@@ -2,7 +2,6 @@
 using EventHorizon.Domain.Entities;
 using EventHorizon.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {
@@ -86,14 +85,18 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
         public Task<EventEntry?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-                _context.EventEntries
-                    .Include(e => e.User)
-                    .FirstOrDefault(u => u.Id == id)
-            );
+            var result = _context.EventEntries
+                .Include(e => e.User)
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+            return result;
         }
 
-        public Task<PaginatedEnumerable<EventEntry>> GetFilteredAsync(Func<EventEntry, bool> predicate, int chunkNumber, int chunkSize, CancellationToken cancellationToken)
+        public Task<PaginatedEnumerable<EventEntry>> GetFilteredAsync(
+            Func<EventEntry, bool> predicate, 
+            int chunkNumber, 
+            int chunkSize, 
+            CancellationToken cancellationToken)
         {
             if (chunkNumber < 0)
             {
@@ -152,12 +155,12 @@ namespace EventHorizon.Infrastructure.Data.Repositories
 
         public Task<IEnumerable<EventEntry>> GetByUserIdWithEventAsync(Guid userId, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-               _context.EventEntries
-                   .Include(ee => ee.Event)
-                   .Where(u => u.UserId == userId)
-                   .AsEnumerable()
-           );
+            var result = _context.EventEntries
+                .Include(ee => ee.Event)
+                .Where(u => u.UserId == userId)
+                .AsEnumerable();
+
+            return Task.FromResult(result);
         }
     }
 }

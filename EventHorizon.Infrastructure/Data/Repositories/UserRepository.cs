@@ -1,6 +1,7 @@
 ﻿using EventHorizon.Contracts.Exceptions;
 using EventHorizon.Domain.Entities;
 using EventHorizon.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventHorizon.Infrastructure.Data.Repositories
 {
@@ -24,18 +25,20 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             return Task.CompletedTask;
         }
 
-        public Task<User?> FindByEmail(string email)
+        public async Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-                _context.Users.FirstOrDefault(u => u.Email == email)
-            );
+            var result = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+
+            return result;
         }
 
-        public Task<User?> FindByRefreshToken(string token)
+        public async Task<User?> FindByRefreshTokenAsync(string token, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-                _context.Users.FirstOrDefault(u => u.RefreshToken == token)
-            );
+            var result = await _context.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == token, cancellationToken);
+
+            return result;
         }
 
         public Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken)
@@ -45,16 +48,18 @@ namespace EventHorizon.Infrastructure.Data.Repositories
             );
         }
 
-        public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(
-                _context.Users.FirstOrDefault(u => u.Id == id)
-            );
+            var result = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+            return result;
         }
 
         public async Task UpdateAsync(User entity, CancellationToken cancellationToken)
         {
-            var tryFind = _context.Users.FirstOrDefault(u => u.Id == entity.Id);
+            var tryFind = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == entity.Id, cancellationToken);
 
             if (tryFind == null)
             {

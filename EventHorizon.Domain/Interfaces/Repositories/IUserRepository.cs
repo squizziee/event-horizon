@@ -5,7 +5,7 @@ namespace EventHorizon.Domain.Interfaces.Repositories
 
     public interface IUserRepository : IRepository<User>
     {
-        Task<User?> FindByEmail(string email);
-        Task<User?> FindByRefreshToken(string token);
+        Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken);
+        Task<User?> FindByRefreshTokenAsync(string token, CancellationToken cancellationToken);
     }
 }

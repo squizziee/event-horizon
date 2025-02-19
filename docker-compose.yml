@@ -16,8 +16,6 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
-    volumes:
-      - eventhorizon_static:/var/lib/eventhorizon_stati/data/
     depends_on:
       - main_database
 

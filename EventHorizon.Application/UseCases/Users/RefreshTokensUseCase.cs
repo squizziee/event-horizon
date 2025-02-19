@@ -21,7 +21,7 @@ namespace EventHorizon.Application.UseCases.Users
 
         public async Task<(string, string)?> ExecuteAsync(string refreshToken, CancellationToken cancellationToken)
         {
-            var tryFind = await _unitOfWork.Users.FindByRefreshToken(refreshToken);
+            var tryFind = await _unitOfWork.Users.FindByRefreshTokenAsync(refreshToken, cancellationToken);
 
             if (tryFind == null)
             {
