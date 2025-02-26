@@ -30,7 +30,7 @@ namespace EventHorizon.Application.UseCases.Users
 
 		// no validation for email existence is done because email PGSQL index was created,
 		// so it will just throw on duplicate email
-		public async Task<(string, string)?> ExecuteAsync(RegisterUserRequest request, CancellationToken cancellationToken)
+		public async Task<(string, string)> ExecuteAsync(RegisterUserRequest request, CancellationToken cancellationToken)
 		{
 			_validator.ValidateAndThrow(request);
 

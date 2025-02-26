@@ -55,13 +55,7 @@ namespace EventHorizon.API.Controllers
         public async Task<IActionResult> GetUserEventEntries(
             CancellationToken cancellationToken)
         {
-            var userId = HttpContext.User.FindFirst(ClaimTypes.Name);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
+            var userId = HttpContext.User.FindFirst(ClaimTypes.Name)!;
             var entries = await _getUserEntriesUseCase.ExecuteAsync(Guid.Parse(userId.Value), cancellationToken);
 
             return Ok(entries);
@@ -73,13 +67,7 @@ namespace EventHorizon.API.Controllers
             [FromRoute] Guid Id,
             CancellationToken cancellationToken)
         {
-            var userId = HttpContext.User.FindFirst(ClaimTypes.Name);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
+            var userId = HttpContext.User.FindFirst(ClaimTypes.Name)!;
             await _addEventEntryUseCase.ExecuteAsync(Guid.Parse(userId.Value), Id, cancellationToken);
 
             return Ok();

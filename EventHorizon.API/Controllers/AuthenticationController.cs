@@ -1,4 +1,5 @@
-﻿using EventHorizon.Application.UseCases.Interfaces.Users;
+﻿using EventHorizon.API.Attributes;
+using EventHorizon.Application.UseCases.Interfaces.Users;
 using EventHorizon.Contracts.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +59,8 @@ namespace EventHorizon.API.Controllers
         {
             var tokens = await _registerUserUseCase.ExecuteAsync(request, cancellationToken);
 
-            if (tokens == null)
-            {
-                return BadRequest();
-            }
-
-            Response.Cookies.Append("accessToken", tokens.Value.Item1, _accessTokenCookieOptions);
-            Response.Cookies.Append("refreshToken", tokens.Value.Item2, _refreshTokenCookieOptions);
+            Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
+            Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
 
             return Ok();
         }
@@ -76,13 +72,8 @@ namespace EventHorizon.API.Controllers
         {
             var tokens = await _loginUseCase.ExecuteAsync(request, cancellationToken);
 
-            if (tokens == null)
-            {
-                return BadRequest();
-            }
-
-            Response.Cookies.Append("accessToken", tokens.Value.Item1, _accessTokenCookieOptions);
-            Response.Cookies.Append("refreshToken", tokens.Value.Item2, _refreshTokenCookieOptions);
+            Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
+            Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
 
             return Ok();
         }
@@ -99,25 +90,16 @@ namespace EventHorizon.API.Controllers
 
         [HttpPost("refresh")]
         [Authorize(Policy = "ViewerPolicy")]
+        [ShouldContainRefreshToken]
         public async Task<IActionResult> RefreshTokens(
             CancellationToken cancellationToken)
         {
             Request.Cookies.TryGetValue("refreshToken", out var refreshToken);
 
-            if (refreshToken == null)
-            {
-                return Unauthorized();
-            }
+            var tokens = await _refreshTokensUseCase.ExecuteAsync(refreshToken!, cancellationToken);
 
-            var tokens = await _refreshTokensUseCase.ExecuteAsync(refreshToken, cancellationToken);
-
-            if (tokens == null)
-            {
-                return BadRequest();
-            }
-
-            Response.Cookies.Append("accessToken", tokens.Value.Item1, _accessTokenCookieOptions);
-            Response.Cookies.Append("refreshToken", tokens.Value.Item2, _refreshTokenCookieOptions);
+            Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
+            Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
 
             return Ok();
         }
@@ -137,12 +119,7 @@ namespace EventHorizon.API.Controllers
         public async Task<IActionResult> GetMe(
             CancellationToken cancellationToken)
         {
-            var userId = HttpContext.User.FindFirst(ClaimTypes.Name);
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            var userId = HttpContext.User.FindFirst(ClaimTypes.Name)!;
 
             var data = await _getUserDataUseCase.ExecuteAsync(Guid.Parse(userId.Value), cancellationToken);
 

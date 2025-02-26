@@ -19,7 +19,7 @@ namespace EventHorizon.Application.UseCases.Users
             _tokenService = tokenService;
         }
 
-        public async Task<(string, string)?> ExecuteAsync(string refreshToken, CancellationToken cancellationToken)
+        public async Task<(string, string)> ExecuteAsync(string refreshToken, CancellationToken cancellationToken)
         {
             var tryFind = await _unitOfWork.Users.FindByRefreshTokenAsync(refreshToken, cancellationToken);
 

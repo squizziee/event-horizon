@@ -23,7 +23,7 @@ namespace EventHorizon.Application.UseCases.Users
             _passwordService = passwordService;
         }
 
-        public async Task<(string, string)?> ExecuteAsync(LoginRequest request, CancellationToken cancellationToken)
+        public async Task<(string, string)> ExecuteAsync(LoginRequest request, CancellationToken cancellationToken)
         {
             var tryFind = await _unitOfWork.Users.FindByEmailAsync(request.Email, cancellationToken);
 
